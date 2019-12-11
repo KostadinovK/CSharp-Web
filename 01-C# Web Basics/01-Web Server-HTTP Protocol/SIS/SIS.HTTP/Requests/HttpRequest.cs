@@ -127,6 +127,11 @@ namespace SIS.HTTP.Requests
 
         private void ParseQueryParameters()
         {
+            if (Url.Split('?').Length < 2)
+            {
+                return;
+            }
+
             var parameters = Url.Split('?')[1].Split('&').ToList();
 
             foreach (var parameter in parameters)
