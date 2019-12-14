@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using SIS.WebServer.Routing.Contracts;
 
 namespace SIS.WebServer
@@ -33,20 +35,19 @@ namespace SIS.WebServer
             isRunning = true;
 
             Console.WriteLine($"Server started at http://{LocalhostIpAddress}:{port}");
-
             while (isRunning)
             {
                 Console.WriteLine("Waiting for client...");
 
-                var client = listener.AcceptSocket();
-                Listen(client);
+                var client = listener.AcceptSocketAsync().GetAwaiter().GetResult();
+                Task.Run(() => Listen(client));
             }
         }
 
-        public void Listen(Socket client)
+        public async Task Listen(Socket client)
         {
             var connectionHandler = new ConnectionHandler(client, serverRoutingTable);
-            connectionHandler.ProcessRequest();
+            await connectionHandler.ProcessRequestAsync();
         }
     }
 }

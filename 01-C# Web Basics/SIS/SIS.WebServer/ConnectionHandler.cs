@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 using SIS.HTTP.Common;
 using SIS.HTTP.Enums;
 using SIS.HTTP.Exceptions;
@@ -27,11 +29,11 @@ namespace SIS.WebServer
             this.serverRoutingTable = serverRoutingTable;
         }
 
-        public void ProcessRequest()
+        public async Task ProcessRequestAsync()
         {
             try
             {
-                var httpRequest = ReadRequest();
+                var httpRequest = await ReadRequestAsync();
 
                 if (httpRequest != null)
                 {
@@ -54,14 +56,14 @@ namespace SIS.WebServer
             client.Shutdown(SocketShutdown.Both);
         }
 
-        private IHttpRequest ReadRequest()
+        private async Task<IHttpRequest> ReadRequestAsync()
         {
             var result = new StringBuilder();
             var data = new ArraySegment<byte>(new byte[1024]);
 
             while (true)
             {
-                int numberOfBytesRead = client.Receive(data.Array, SocketFlags.None);
+                int numberOfBytesRead = await client.ReceiveAsync(data, SocketFlags.None);
 
                 if (numberOfBytesRead == 0)
                 {
@@ -99,7 +101,7 @@ namespace SIS.WebServer
         {
             var byteSegments = httpResponse.GetBytes();
 
-            client.Send(byteSegments, SocketFlags.None);
+            client.Send(byteSegments.ToArray(), SocketFlags.None);
         }
 
     }
