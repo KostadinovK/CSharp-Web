@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SIS.HTTP.Common;
+using SIS.HTTP.Cookies;
+using SIS.HTTP.Cookies.Contracts;
 using SIS.HTTP.Enums;
 using SIS.HTTP.Exceptions;
 using SIS.HTTP.Extensions;
 using SIS.HTTP.Headers;
 using SIS.HTTP.Headers.Contracts;
 using SIS.HTTP.Requests.Contracts;
+using SIS.HTTP.Sessions;
+using SIS.HTTP.Sessions.Contracts;
 
 namespace SIS.HTTP.Requests
 {
@@ -20,6 +24,8 @@ namespace SIS.HTTP.Requests
         public Dictionary<string, object> QueryData { get; }
         public IHttpHeaderCollection Headers { get; }
         public HttpRequestMethod RequestMethod { get; private set; }
+        public IHttpCookieCollection Cookies { get; }
+        public IHttpSession Session { get; set; }
 
         public HttpRequest(string requestString)
         {
@@ -28,7 +34,7 @@ namespace SIS.HTTP.Requests
             FormData = new Dictionary<string, object>();
             QueryData = new Dictionary<string, object>();
             Headers = new HttpHeaderCollection();
-
+            Cookies = new HttpCookieCollection();
             ParseRequest(requestString);
         }
 
@@ -50,6 +56,7 @@ namespace SIS.HTTP.Requests
             ParseRequestPath();
 
             ParseRequestHeaders(ParsePlainHeaders(splitRequestString).ToArray());
+            ParseRequestCookies();
 
             ParseRequestParameters(splitRequestString[splitRequestString.Length - 1]);
         }
@@ -116,6 +123,24 @@ namespace SIS.HTTP.Requests
 
                 var header = new HttpHeader(kvp[0], kvp[1]);
                 Headers.AddHeader(header);
+            }
+        }
+
+        private void ParseRequestCookies()
+        {
+            if (!Headers.ContainsHeader("Cookie"))
+            {
+                return;
+            }
+
+            var cookies = Headers.GetHeader("Cookie").Value.Split(new []{"; "}, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var cookie in cookies)
+            {
+                var key = cookie.Split('=')[0];
+                var value = cookie.Split('=')[1];
+
+                Cookies.AddCookie(new HttpCookie(key, value, false));
             }
         }
 

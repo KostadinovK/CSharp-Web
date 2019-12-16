@@ -1,11 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Text;
-using SIS.HTTP.Common;
-using SIS.HTTP.Enums;
-using SIS.HTTP.Headers;
-using SIS.HTTP.Requests;
-using SIS.HTTP.Responses;
+﻿using SIS.HTTP.Enums;
 using SIS.WebServer;
 using SIS.WebServer.Routing;
 using SIS.WebServer.Routing.Contracts;
@@ -18,7 +11,7 @@ namespace SIS.Demo
         {
             IServerRoutingTable serverRoutingTable = new ServerRoutingTable();
 
-            serverRoutingTable.Add(HttpRequestMethod.Get, "/", request => new HomeController().Index(request));
+            serverRoutingTable.Add(HttpRequestMethod.Get, "/", request => new HomeController().Home(request));
 
             Server server = new Server(8000, serverRoutingTable);
             server.Run();

@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 using SIS.HTTP.Common;
+using SIS.HTTP.Cookies;
+using SIS.HTTP.Cookies.Contracts;
 using SIS.HTTP.Enums;
 using SIS.HTTP.Headers;
 using SIS.HTTP.Headers.Contracts;
@@ -13,12 +16,15 @@ namespace SIS.HTTP.Responses
     {
         public HttpResponseStatusCode StatusCode { get; set; }
         public IHttpHeaderCollection Headers { get; }
+        public IHttpCookieCollection Cookies { get; }
+
         public byte[] Content { get; set; }
 
         public HttpResponse()
         {
             Headers = new HttpHeaderCollection();
             Content = new byte[0];
+            Cookies = new HttpCookieCollection();
         }
 
         public HttpResponse(HttpResponseStatusCode statusCode) : this()
@@ -33,6 +39,13 @@ namespace SIS.HTTP.Responses
             CoreValidator.ThrowIfNull(header, nameof(header));
 
             Headers.AddHeader(header);
+        }
+
+        public void AddCookie(HttpCookie cookie)
+        {
+            CoreValidator.ThrowIfNull(cookie, nameof(cookie));
+
+            Cookies.AddCookie(cookie);
         }
 
         public byte[] GetBytes()
@@ -62,6 +75,14 @@ namespace SIS.HTTP.Responses
             sb.Append(GlobalConstants.HttpNewLine);
             sb.Append(Headers);
             sb.Append(GlobalConstants.HttpNewLine);
+            if (Cookies.HasCookies())
+            {
+                foreach (var cookie in Cookies)
+                {
+                    sb.Append($"Set-Cookie: {cookie}");
+                    sb.Append(GlobalConstants.HttpNewLine);
+                }
+            }
             sb.Append(GlobalConstants.HttpNewLine);
 
             return sb.ToString();
