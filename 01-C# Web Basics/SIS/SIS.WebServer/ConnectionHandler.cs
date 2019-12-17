@@ -7,7 +7,6 @@ using SIS.HTTP.Common;
 using SIS.HTTP.Cookies;
 using SIS.HTTP.Enums;
 using SIS.HTTP.Exceptions;
-using SIS.HTTP.Headers;
 using SIS.HTTP.Requests;
 using SIS.HTTP.Requests.Contracts;
 using SIS.HTTP.Responses.Contracts;
