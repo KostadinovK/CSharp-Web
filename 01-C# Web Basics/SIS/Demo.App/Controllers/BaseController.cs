@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Runtime.CompilerServices;
 using SIS.HTTP.Common;
 using SIS.HTTP.Cookies;
@@ -14,19 +15,26 @@ namespace SIS.Demo
 
         protected IHttpRequest HttpRequest { get; set; }
 
-        private bool IsLoggedIn()
+        protected  Dictionary<string, object> ViewData = new Dictionary<string, object>();
+
+        protected BaseController(IHttpRequest request)
+        {
+            HttpRequest = request;
+        }
+
+        protected bool IsLoggedIn()
         {
             return HttpRequest.Session.ContainsParameter("username");
         }
 
         private string ParseTemplate(string viewContent)
         {
-            if (IsLoggedIn())
+            foreach (var param in ViewData)
             {
-                return viewContent.Replace("@Model.HelloMessage", $"Hello, {HttpRequest.Session.GetParameter("username")}!");
+                viewContent = viewContent.Replace($"@Model.{param.Key}", param.Value.ToString());
             }
 
-            return viewContent.Replace("@Model.HelloMessage", "Hello from the server!");
+            return viewContent;
         }
 
         public IHttpResponse View([CallerMemberName] string view = null)

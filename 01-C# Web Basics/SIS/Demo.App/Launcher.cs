@@ -1,4 +1,5 @@
-﻿using SIS.HTTP.Enums;
+﻿using SIS.Demo.Controllers;
+using SIS.HTTP.Enums;
 using SIS.WebServer;
 using SIS.WebServer.Routing;
 using SIS.WebServer.Routing.Contracts;
@@ -11,9 +12,15 @@ namespace SIS.Demo
         {
             IServerRoutingTable serverRoutingTable = new ServerRoutingTable();
 
-            serverRoutingTable.Add(HttpRequestMethod.Get, "/", request => new HomeController().Home(request));
-            serverRoutingTable.Add(HttpRequestMethod.Get, "/login", request => new HomeController().Login(request));
-            serverRoutingTable.Add(HttpRequestMethod.Get, "/logout", request => new HomeController().Logout(request));
+            // GET Mappings
+            serverRoutingTable.Add(HttpRequestMethod.Get, "/", request => new HomeController(request).Home());
+            serverRoutingTable.Add(HttpRequestMethod.Get, "/register", request => new UsersController(request).Register());
+            serverRoutingTable.Add(HttpRequestMethod.Get, "/login", request => new UsersController(request).Login());
+            serverRoutingTable.Add(HttpRequestMethod.Get, "/logout", request => new UsersController(request).Logout());
+
+            //POST Mappings
+            serverRoutingTable.Add(HttpRequestMethod.Post, "/register", request => new UsersController(request).RegisterConfirm());
+            serverRoutingTable.Add(HttpRequestMethod.Post, "/login", request => new UsersController(request).LoginConfirm());
 
             Server server = new Server(8000, serverRoutingTable);
             server.Run();

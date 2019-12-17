@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29519.181
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIS.HTTP", "SIS.HTTP\SIS.HTTP.csproj", "{3ADBA68C-CF50-417C-B92A-0DB018E0F646}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIS.HTTP", "SIS.HTTP\SIS.HTTP.csproj", "{3ADBA68C-CF50-417C-B92A-0DB018E0F646}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIS.WebServer", "SIS.WebServer\SIS.WebServer.csproj", "{D8E0F5C3-118A-48F1-B45F-B9312EA91557}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIS.WebServer", "SIS.WebServer\SIS.WebServer.csproj", "{D8E0F5C3-118A-48F1-B45F-B9312EA91557}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIS.Demo", "Demo.App\SIS.Demo.csproj", "{F762D7D7-AD5B-4B2B-B34A-FE420B604619}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIS.Demo", "Demo.App\SIS.Demo.csproj", "{F762D7D7-AD5B-4B2B-B34A-FE420B604619}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo.Data", "Demo.Data\Demo.Data.csproj", "{39C72C6E-32BF-4BA7-9C3A-DA48591543F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{F762D7D7-AD5B-4B2B-B34A-FE420B604619}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F762D7D7-AD5B-4B2B-B34A-FE420B604619}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F762D7D7-AD5B-4B2B-B34A-FE420B604619}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39C72C6E-32BF-4BA7-9C3A-DA48591543F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39C72C6E-32BF-4BA7-9C3A-DA48591543F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39C72C6E-32BF-4BA7-9C3A-DA48591543F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39C72C6E-32BF-4BA7-9C3A-DA48591543F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
