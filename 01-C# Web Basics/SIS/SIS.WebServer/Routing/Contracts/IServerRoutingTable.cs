@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using SIS.HTTP.Enums;
 using SIS.HTTP.Requests.Contracts;
 using SIS.HTTP.Responses.Contracts;
@@ -13,6 +11,6 @@ namespace SIS.WebServer.Routing.Contracts
 
         bool Contains(HttpRequestMethod method, string path);
 
-        Func<IHttpRequest, IHttpResponse> Get(HttpRequestMethod method, string path);
+        Func<IHttpRequest, IHttpResponse> Get(HttpRequestMethod requestMethod, string path);
     }
 }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using SIS.HTTP.Cookies.Contracts;
 using SIS.HTTP.Enums;
 using SIS.HTTP.Headers.Contracts;
@@ -10,9 +8,9 @@ namespace SIS.HTTP.Requests.Contracts
 {
     public interface IHttpRequest
     {
-        string Url { get; }
-
         string Path { get; }
+
+        string Url { get; }
 
         Dictionary<string, object> FormData { get; }
 
@@ -20,9 +18,9 @@ namespace SIS.HTTP.Requests.Contracts
 
         IHttpHeaderCollection Headers { get; }
 
-        HttpRequestMethod RequestMethod { get; }
-
         IHttpCookieCollection Cookies { get; }
+
+        HttpRequestMethod RequestMethod { get; }
 
         IHttpSession Session { get; set; }
     }

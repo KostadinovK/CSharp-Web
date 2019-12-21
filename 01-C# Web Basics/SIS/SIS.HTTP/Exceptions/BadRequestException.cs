@@ -1,15 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Transactions;
 
 namespace SIS.HTTP.Exceptions
 {
     public class BadRequestException : Exception
     {
-        private const string BadRequestDefaultMessage = "The Request was malformed or contains unsupported elements.";
+        private const string BadRequestExceptionDefaultMessage = "The Request was malformed or contains unsupported elements.";
 
-        public BadRequestException() : this(BadRequestDefaultMessage) { }
+        public BadRequestException() : this(BadRequestExceptionDefaultMessage)
+        {
+            
+        }
 
-        public BadRequestException(string message) : base(message) { }
+        public BadRequestException(string name) : base(name)
+        {
+            
+        }
     }
 }

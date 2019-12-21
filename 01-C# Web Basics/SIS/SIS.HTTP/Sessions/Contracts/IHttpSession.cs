@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SIS.HTTP.Sessions.Contracts
+﻿namespace SIS.HTTP.Sessions.Contracts
 {
     public interface IHttpSession
     {
         string Id { get; }
 
-        object GetParameter(string name);
+        object GetParameter(string parameterName);
 
-        bool ContainsParameter(string name);
+        bool ContainsParameter(string parameterName);
 
-        void AddParameter(string name, object parameter);
+        void AddParameter(string parameterName, object parameter);
 
         void ClearParameters();
     }

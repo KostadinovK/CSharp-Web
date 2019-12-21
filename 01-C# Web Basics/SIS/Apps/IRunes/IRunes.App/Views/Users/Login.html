@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>IRunes</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body>
+    <div>
+        <header>
+            <nav class="navbar navbar-expand-lg navbar-light bg-success">
+                <a class="navbar-brand text-white" href="/Home/Index">IRunes</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item active">
+                            <a class="nav-link text-white" href="/Home/Index">Home</a>
+                        </li>
+                        <li class="nav-item active">
+                            <a class="nav-link text-white" href="/Users/Login">Login</a>
+                        </li>
+                        <li class="nav-item active">
+                            <a class="nav-link text-white" href="/Users/Register">Register</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        <hr style="height: 2px" class="bg-success" />
+        <main class="container-fluid w-50 mx-auto">
+            <h1 class="text-success text-center">Login</h1>
+            <hr style="height: 2px" class="bg-success" />
+            <form  action="/Users/Login" method="POST">
+                <div class="form-group">
+                    <label for="username">Username / Email</label>
+                    <input class="form-control" type="text" id="username" name="username" placeholder="Username / Email..." />
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input class="form-control" type="password" id="password" name="password" placeholder="Password..." />
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-success d-flex mx-auto">Login</button>
+                </div>
+            </form>
+        </main>
+        <hr style="height: 2px" class="bg-success mt-5" />
+        <footer>
+            <h5 class="text-center">CopyRight &copy; Sanity Design Studios. All rights reserved.</h5>
+        </footer>
+    </div>
+</body>
+</html>
