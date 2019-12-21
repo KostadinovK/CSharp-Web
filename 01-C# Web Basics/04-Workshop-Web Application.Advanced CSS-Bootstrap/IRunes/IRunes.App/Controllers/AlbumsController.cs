@@ -35,7 +35,7 @@ namespace IRunes.App.Controllers
                 {
                     foreach (var album in context.Albums.ToList())
                     {
-                        sb.AppendLine($"<a href=/Albums/Details?id={album.Id}>{WebUtility.UrlDecode(album.Name)}</a>");
+                        sb.AppendLine($"<a class=\"text-primary font-weight-bold\" href=/Albums/Details?id={album.Id}>{WebUtility.UrlDecode(album.Name)}</a>");
                     }
                 }
             }
