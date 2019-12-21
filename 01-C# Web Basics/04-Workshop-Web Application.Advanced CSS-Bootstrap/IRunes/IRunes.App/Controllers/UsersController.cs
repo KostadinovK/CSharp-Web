@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using IRunes.Data;
 using IRunes.Models.Models;
 using SIS.HTTP.Requests.Contracts;
@@ -10,6 +12,13 @@ namespace IRunes.App.Controllers
 {
     public class UsersController : BaseController
     {
+        private string ComputeSha256Hash(string password)
+        {
+            using SHA256 sha256Hash = SHA256.Create();
+            
+            return Encoding.UTF8.GetString(sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password)));
+        }
+
         public IHttpResponse Register(IHttpRequest httpRequest)
         {
             return this.View();
@@ -29,11 +38,13 @@ namespace IRunes.App.Controllers
                     return Redirect("/Users/Register");
                 }
 
+                var passwordHashed = ComputeSha256Hash(password);
+
                 var user = new User
                 {
                     Id = Guid.NewGuid().ToString(),
                     Username = username,
-                    Password = password,
+                    Password = passwordHashed,
                     Email = email
                 };
 
@@ -61,7 +72,7 @@ namespace IRunes.App.Controllers
                 var username = ((ISet<string>)httpRequest.FormData["username"]).FirstOrDefault();
                 var password = ((ISet<string>)httpRequest.FormData["password"]).FirstOrDefault();
                 
-                var user = context.Users.FirstOrDefault(u => (u.Username == username && u.Password == password) || (u.Email == username && u.Password == password));
+                var user = context.Users.FirstOrDefault(u => (u.Username == username && u.Password == ComputeSha256Hash(password)) || (u.Email == username && u.Password == ComputeSha256Hash(password)));
 
                 if (user == null)
                 {

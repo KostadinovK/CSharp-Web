@@ -139,7 +139,7 @@ namespace SIS.WebServer
                     Console.WriteLine($"Processing: {httpRequest.RequestMethod} {httpRequest.Path}...");
 
                     string sessionId = this.SetRequestSession(httpRequest);
-                    Console.WriteLine(sessionId);
+                    
                     httpResponse = this.HandleRequest(httpRequest);
 
                     this.SetResponseSession(httpResponse, sessionId);

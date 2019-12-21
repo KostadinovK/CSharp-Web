@@ -30,10 +30,16 @@
         </header>
         <hr style="height: 2px" />
         <main>
-            {{{track}}}
-            <hr />
             <div>
-                <a href="/Albums/Details?id={{{albumId}}}">Back To Album</a>
+                <iframe width="800" height="400"
+                        src="@Model.Link">
+                </iframe>
+                <h2>Name: @Model.Name</h2>
+                <h2>Price: @Model.Price</h2>
+            </div>
+            <hr/>
+            <div>
+                <a href="/Albums/Details?id=@Model.AlbumId">Back To Album</a>
             </div>
         </main>
         <hr style="height: 2px" />

@@ -16,6 +16,7 @@ namespace IRunes.Models.Models
         [Required]
         public string Cover { get; set; }
 
+        [Range(0, double.MaxValue)]
         public decimal Price { get; set; }
 
         public ICollection<Track> Tracks { get; set; } = new HashSet<Track>();
