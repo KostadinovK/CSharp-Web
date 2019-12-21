@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>IRunes</title>
+</head>
+<body>
+    <div>
+        <header>
+            <nav>
+                <a href="#">IRunes</a>
+                <button type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span></span>
+                </button>
+                <div id="navbarNav">
+                    <ul>
+                        <li>
+                            <a href="/">Home</a>
+                        </li>
+                        <li>
+                            <a href="/Albums/All">Albums</a>
+                        </li>
+                        <li>
+                            <a href="/Users/Logout">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        <hr style="height: 2px" />
+        <main>
+            {{{track}}}
+            <hr />
+            <div>
+                <a href="/Albums/Details?id={{{albumId}}}">Back To Album</a>
+            </div>
+        </main>
+        <hr style="height: 2px" />
+        <footer>
+            <h5>CopyRight &copy; Sanity Design Studios. All rights reserved.</h5>
+        </footer>
+    </div>
+</body>
+</html>

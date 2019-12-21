@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>IRunes</title>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="#">IRunes</a>
+            <button type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span></span>
+            </button>
+            <div id="navbarNav">
+                <ul>
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    <li>
+                        <a href="/Albums/All">Albums</a>
+                    </li>
+                    <li>
+                        <a href="/Users/Logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <hr style="height: 2px" />
+    <main>
+        <h1>Create Track</h1>
+        <hr style="height: 2px" />
+        <form action="/Tracks/Create?albumId={{{albumId}}}" method="POST">
+            <div>
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" placeholder="Name..." />
+            </div>
+            <div>
+                <div>
+                    <label for="link">Link</label>
+                    <input type="text" id="link" name="link" placeholder="Link..." />
+                </div>
+                <div>
+                    <label for="price">Price</label>
+                    <input type="text" id="price" name="price" placeholder="Price..." />
+                </div>
+            </div>
+            <hr style="height: 2px" />
+            <div>
+                <button type="submit">Create</button>
+                <a href="/Albums/Details?id={{{albumId}}}">Back To Album</a>
+            </div>
+        </form>
+    </main>
+    <hr style="height: 2px" />
+    <footer>
+        <h5>CopyRight &copy; Sanity Design Studios. All rights reserved.</h5>
+    </footer>
+</body>
+</html>
