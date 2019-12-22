@@ -1,31 +1,25 @@
-﻿using IRunes.App.Controllers;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using IRunes.App.Controllers;
+using IRunes.Data;
+using SIS.HTTP.Enums;
+using SIS.MvcFramework;
+using SIS.WebServer;
+using SIS.WebServer.Result;
+using SIS.WebServer.Routing;
 
 namespace IRunes.App
 {
-    using SIS.WebServer;
-    using SIS.WebServer.Result;
-    using SIS.WebServer.Routing;
-    using SIS.HTTP.Enums;
-    using Data;
-
-    public class Launcher
+    public class Startup : IMvcApplication
     {
-        public static void Main(string[] args)
+        public void Configure(IServerRoutingTable serverRoutingTable)
         {
             using (var context = new RunesDbContext())
             {
                 context.Database.EnsureCreated();
             }
 
-            ServerRoutingTable serverRoutingTable = new ServerRoutingTable();
-            Configure(serverRoutingTable);
-
-            Server server = new Server(8000, serverRoutingTable);
-            server.Run();
-        }
-
-        private static void Configure(ServerRoutingTable serverRoutingTable)
-        {
             serverRoutingTable.Add(HttpRequestMethod.Get, "/", request => new RedirectResult("/Home/Index"));
 
             serverRoutingTable.Add(HttpRequestMethod.Get, "/Home/Index", request => new HomeController().Index(request));
@@ -52,6 +46,10 @@ namespace IRunes.App
             serverRoutingTable.Add(HttpRequestMethod.Post, "/Tracks/Create", request => new TracksController().CreateConfirm(request));
             serverRoutingTable.Add(HttpRequestMethod.Get, "/Tracks/Details", request => new TracksController().Details(request));
             #endregion
+        }
+
+        public void ConfigureServices()
+        {
         }
     }
 }
