@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SIS.HTTP.Cookies.Contracts
+namespace SIS.HTTP.Cookies
 {
     public interface IHttpCookieCollection : IEnumerable<HttpCookie>
     {

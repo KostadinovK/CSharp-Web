@@ -4,8 +4,8 @@ using System.Runtime.CompilerServices;
 using SIS.HTTP.Common;
 using SIS.HTTP.Cookies;
 using SIS.HTTP.Enums;
-using SIS.HTTP.Requests.Contracts;
-using SIS.HTTP.Responses.Contracts;
+using SIS.HTTP.Requests;
+using SIS.HTTP.Responses;
 using SIS.WebServer.Results;
 
 namespace SIS.Demo

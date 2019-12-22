@@ -6,9 +6,8 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text;
 using SIS.HTTP.Enums;
-using SIS.HTTP.Requests.Contracts;
+using SIS.HTTP.Requests;
 using SIS.HTTP.Responses;
-using SIS.HTTP.Responses.Contracts;
 using SIS.WebServer.Result;
 
 namespace IRunes.App.Controllers
