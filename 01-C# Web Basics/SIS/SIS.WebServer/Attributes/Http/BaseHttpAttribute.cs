@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using SIS.HTTP.Enums;
 
-namespace SIS.MvcFramework.Attributes
+namespace SIS.MvcFramework.Attributes.Http
 {
     public abstract class BaseHttpAttribute : Attribute
     {

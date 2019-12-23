@@ -7,6 +7,8 @@ using System.Text;
 using SIS.HTTP.Enums;
 using SIS.HTTP.Responses;
 using SIS.MvcFramework.Attributes;
+using SIS.MvcFramework.Attributes.Action;
+using SIS.MvcFramework.Attributes.Http;
 using SIS.WebServer;
 using SIS.WebServer.Results;
 using SIS.WebServer.Routing;
@@ -40,8 +42,8 @@ namespace SIS.MvcFramework
                 var controllerName = controller.Name.Replace("Controller", "");
 
                 var actions = controller
-                    .GetMethods(BindingFlags.Instance | BindingFlags.Public)
-                    .Where(m => m.ReturnType == typeof(IHttpResponse) && !m.IsVirtual)
+                    .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
+                    .Where(m => m.ReturnType == typeof(IHttpResponse) && !m.IsVirtual && m.GetCustomAttributes().All(attribute => attribute.GetType() != typeof(NonActionAttribute)))
                     .ToList();
 
                 foreach (var action in actions)

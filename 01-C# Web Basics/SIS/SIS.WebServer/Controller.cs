@@ -7,6 +7,7 @@ using System.Text;
 using SIS.HTTP.Enums;
 using SIS.HTTP.Requests;
 using SIS.HTTP.Responses;
+using SIS.MvcFramework.Result;
 using SIS.WebServer.Result;
 
 namespace SIS.MvcFramework
