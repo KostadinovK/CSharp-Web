@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Text;
+using IRunes.App.ViewModels;
 using IRunes.Data;
 using IRunes.Models.Models;
 using IRunes.Services;
@@ -12,6 +13,7 @@ using SIS.HTTP.Requests;
 using SIS.MvcFramework;
 using SIS.MvcFramework.Attributes.Http;
 using SIS.MvcFramework.Attributes.Security;
+using SIS.MvcFramework.Mapping;
 using SIS.MvcFramework.Result;
 
 namespace IRunes.App.Controllers
@@ -90,6 +92,13 @@ namespace IRunes.App.Controllers
             var albumId = Request.QueryData["id"].ToString();
 
             var album = albumService.GetAlbumById(albumId);
+
+            var albumViewModel = ModelMapper.ProjectTo<AlbumViewModel>(album);
+
+            if (album == null)
+            {
+                return Redirect("/Albums/All");
+            }
 
             ViewData.Add("AlbumId", album.Id);
             ViewData.Add("AlbumName", WebUtility.UrlDecode(album.Name));
