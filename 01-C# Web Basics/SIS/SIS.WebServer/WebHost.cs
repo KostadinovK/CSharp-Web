@@ -4,8 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using SIS.HTTP.Enums;
+using SIS.HTTP.Responses;
 using SIS.MvcFramework.Attributes.Action;
 using SIS.MvcFramework.Attributes.Http;
+using SIS.MvcFramework.Attributes.Security;
 using SIS.MvcFramework.Result;
 using SIS.WebServer;
 using SIS.WebServer.Routing;
@@ -72,7 +74,18 @@ namespace SIS.MvcFramework
                     serverRoutingTable.Add(httpMethod, path, request => 
                     {
                         var controllerInstance = Activator.CreateInstance(controller);
-                        var response = action.Invoke(controllerInstance, new object[] {request}) as ActionResult;
+                        ((Controller) controllerInstance).Request = request;
+                        var response = action.Invoke(controllerInstance, new object[0]) as ActionResult;
+
+                        var controllerPrincipal = ((Controller) controllerInstance).User;
+                        var authorizeAttribute =
+                            action.GetCustomAttributes().LastOrDefault(a => a.GetType() == typeof(AuthorizeAttribute))
+                                as AuthorizeAttribute;
+
+                        if (authorizeAttribute != null && !authorizeAttribute.IsInAuthority(controllerPrincipal))
+                        {
+                            return new HttpResponse(HttpResponseStatusCode.Forbidden);
+                        }
 
                         return response;
                     });

@@ -10,18 +10,18 @@ namespace IRunes.App.Controllers
 {
     public class InfoController : Controller
     {
-        public ActionResult About(IHttpRequest httpRequest)
+        public ActionResult About()
         {
             return View();
         }
 
-        public ActionResult File(IHttpRequest request)
+        public ActionResult File()
         {
             string folderPrefix = "/../../../../";
             string resourceFolder = "Resources/";
             string assemblyFolderPath = this.GetType().Assembly.Location;
 
-            string fullPath = assemblyFolderPath + folderPrefix + resourceFolder + request.QueryData["file"];
+            string fullPath = assemblyFolderPath + folderPrefix + resourceFolder + Request.QueryData["file"];
             if (System.IO.File.Exists(fullPath))
             {
                 string mimeType = null;

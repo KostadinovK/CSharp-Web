@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using IRunes.Data;
 using IRunes.Models.Models;
+using IRunes.Services;
 using SIS.HTTP.Requests;
 using SIS.HTTP.Responses;
 using SIS.MvcFramework;
@@ -17,6 +18,13 @@ namespace IRunes.App.Controllers
 {
     public class UsersController : Controller
     {
+        private readonly UserService userService;
+
+        public UsersController()
+        {
+            userService = new UserService();
+        }
+
         private string ComputeSha256Hash(string password)
         {
             using SHA256 sha256Hash = SHA256.Create();
@@ -24,77 +32,71 @@ namespace IRunes.App.Controllers
             return Encoding.UTF8.GetString(sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password)));
         }
 
-        public ActionResult Register(IHttpRequest httpRequest)
+        public ActionResult Register()
         {
             return this.View();
         }
 
         [HttpPost(ActionName = "Register")]
-        public ActionResult RegisterConfirm(IHttpRequest httpRequest)
+        public ActionResult RegisterConfirm()
         {
-            using (var context = new RunesDbContext())
+            var username = ((ISet<string>)Request.FormData["username"]).FirstOrDefault();
+            var password = ((ISet<string>)Request.FormData["password"]).FirstOrDefault();
+            var confirmPassword = ((ISet<string>)Request.FormData["confirmPassword"]).FirstOrDefault();
+            var email = ((ISet<string>)Request.FormData["email"]).FirstOrDefault();
+
+            if (password != confirmPassword)
             {
-                var username = ((ISet<string>)httpRequest.FormData["username"]).FirstOrDefault();
-                var password = ((ISet<string>)httpRequest.FormData["password"]).FirstOrDefault();
-                var confirmPassword = ((ISet<string>)httpRequest.FormData["confirmPassword"]).FirstOrDefault();
-                var email = ((ISet<string>)httpRequest.FormData["email"]).FirstOrDefault();
-
-                if (password != confirmPassword)
-                {
-                    return Redirect("/Users/Register");
-                }
-
-                var passwordHashed = ComputeSha256Hash(password);
-
-                var user = new User
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Username = username,
-                    Password = passwordHashed,
-                    Email = email
-                };
-
-                if (!IsValid(user))
-                {
-                    return Redirect("/Users/Register");
-                }
-
-                context.Users.Add(user);
-                context.SaveChanges();
+                return Redirect("/Users/Register");
             }
+
+            var passwordHashed = ComputeSha256Hash(password);
+
+            var user = new User
+            {
+                Id = Guid.NewGuid().ToString(),
+                Username = username,
+                Password = passwordHashed,
+                Email = email
+            };
+
+            if (!IsValid(user))
+            {
+                return Redirect("/Users/Register");
+            }
+
+            userService.CreateUser(user);
 
             return Redirect("/Users/Login");
         }
 
-        public ActionResult Login(IHttpRequest httpRequest)
+        public ActionResult Login()
         {
             return this.View();
         }
 
         [HttpPost(ActionName = "Login")]
-        public ActionResult LoginConfirm(IHttpRequest httpRequest)
+        public ActionResult LoginConfirm()
         {
-            using (var context = new RunesDbContext())
+            var username = ((ISet<string>)Request.FormData["username"]).FirstOrDefault();
+            var password = ((ISet<string>)Request.FormData["password"]).FirstOrDefault();
+
+            var user = userService.GetUserByUsernameAndPassword(username, ComputeSha256Hash(password));
+
+            if (user == null)
             {
-                var username = ((ISet<string>)httpRequest.FormData["username"]).FirstOrDefault();
-                var password = ((ISet<string>)httpRequest.FormData["password"]).FirstOrDefault();
-                
-                var user = context.Users.FirstOrDefault(u => (u.Username == username && u.Password == ComputeSha256Hash(password)) || (u.Email == username && u.Password == ComputeSha256Hash(password)));
-
-                if (user == null)
-                {
-                    return Redirect("/Users/Register");
-                }
-
-                SignIn(httpRequest, user.Id, user.Username, user.Email);
+                return Redirect("/Users/Register");
             }
+
+            SignIn(user.Id, user.Username, user.Email);
+
 
             return Redirect("/Home/Index");
         }
 
-        public ActionResult Logout(IHttpRequest httpRequest)
+        public ActionResult Logout()
         {
-            SignOut(httpRequest);
+            SignOut();
 
             return Redirect("/Home/Index");
         }

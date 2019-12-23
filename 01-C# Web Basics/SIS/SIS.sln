@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IRunes.Data", "Apps\IRunes\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IRunes.Models", "Apps\IRunes\IRunes.Models\IRunes.Models.csproj", "{FF63C5AF-ECF6-4D5D-B705-D7A5391A24CA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IRunes.Services", "Apps\IRunes\IRunes.Services\IRunes.Services.csproj", "{1A8D789B-C768-42F0-A0E1-3BC5F5E9936D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{FF63C5AF-ECF6-4D5D-B705-D7A5391A24CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF63C5AF-ECF6-4D5D-B705-D7A5391A24CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF63C5AF-ECF6-4D5D-B705-D7A5391A24CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A8D789B-C768-42F0-A0E1-3BC5F5E9936D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A8D789B-C768-42F0-A0E1-3BC5F5E9936D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A8D789B-C768-42F0-A0E1-3BC5F5E9936D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A8D789B-C768-42F0-A0E1-3BC5F5E9936D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -52,6 +58,7 @@ Global
 		{BE8C7233-C46C-47D0-B14A-025060C8BA81} = {8B2E3547-BC83-425D-A454-9451398E8C04}
 		{34D56A34-DA60-4E6A-997C-1672692BA262} = {8B2E3547-BC83-425D-A454-9451398E8C04}
 		{FF63C5AF-ECF6-4D5D-B705-D7A5391A24CA} = {8B2E3547-BC83-425D-A454-9451398E8C04}
+		{1A8D789B-C768-42F0-A0E1-3BC5F5E9936D} = {8B2E3547-BC83-425D-A454-9451398E8C04}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {95749778-C448-4913-B813-04C78D964222}

@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
+﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Xml.Serialization;
 using SIS.HTTP.Enums;
 using SIS.HTTP.Requests;
-using SIS.HTTP.Responses;
 using SIS.MvcFramework.Extensions;
+using SIS.MvcFramework.Identity;
 using SIS.MvcFramework.Result;
 
 namespace SIS.MvcFramework
@@ -17,26 +12,36 @@ namespace SIS.MvcFramework
     {
         protected Dictionary<string, object> ViewData { get; set; } = new Dictionary<string, object>();
 
+        public IHttpRequest Request { get; set; }
+
+        public Principal User => 
+            Request.Session.ContainsParameter("principal")
+            ? (Principal) Request.Session.GetParameter("principal")
+            : null;
+
         protected Controller()
         {
            
         }
 
-        protected bool IsLoggedIn(IHttpRequest httpRequest)
+        protected bool IsLoggedIn()
         {
-            return httpRequest.Session.ContainsParameter("username");
+            return Request.Session.ContainsParameter("principal");
         }
 
-        protected void SignIn(IHttpRequest httpRequest, string id, string username, string email)
+        protected void SignIn(string id, string username, string email)
         {
-            httpRequest.Session.AddParameter("username", username);
-            httpRequest.Session.AddParameter("id", id);
-            httpRequest.Session.AddParameter("email", email);
+            Request.Session.AddParameter("principal", new Principal()
+            {
+                Id = id,
+                Username = username,
+                Email = email
+            });
         }
 
-        protected void SignOut(IHttpRequest httpRequest)
+        protected void SignOut()
         {
-            httpRequest.Session.ClearParameters();
+            Request.Session.ClearParameters();
         }
 
         private string ParseTemplate(string viewContent)

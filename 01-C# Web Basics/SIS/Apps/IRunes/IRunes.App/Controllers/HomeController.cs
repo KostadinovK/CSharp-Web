@@ -3,6 +3,8 @@ using SIS.HTTP.Responses;
 using SIS.MvcFramework;
 using SIS.MvcFramework.Attributes;
 using SIS.MvcFramework.Attributes.Http;
+using SIS.MvcFramework.Attributes.Security;
+using SIS.MvcFramework.Identity;
 using SIS.MvcFramework.Result;
 
 namespace IRunes.App.Controllers
@@ -10,16 +12,17 @@ namespace IRunes.App.Controllers
     public class HomeController : Controller
     {
         [HttpGet(Url = "/")]
-        public ActionResult IndexSlash(IHttpRequest httpRequest)
+        public ActionResult IndexSlash()
         {
-            return Index(httpRequest);
+            return Index();
         }
 
-        public ActionResult Index(IHttpRequest httpRequest)
+        [Authorize]
+        public ActionResult Index()
         {
-            if (IsLoggedIn(httpRequest))
+            if (IsLoggedIn())
             {
-                ViewData.Add("Username", httpRequest.Session.GetParameter("username").ToString());
+                ViewData.Add("Username",((Principal) Request.Session.GetParameter("principal")).Username);
                 return this.View("/Index-Logged");
             }
 
