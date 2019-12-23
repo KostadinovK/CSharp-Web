@@ -11,12 +11,13 @@ using SIS.HTTP.Responses;
 using SIS.MvcFramework;
 using SIS.MvcFramework.Attributes;
 using SIS.MvcFramework.Attributes.Http;
+using SIS.MvcFramework.Result;
 
 namespace IRunes.App.Controllers
 {
     public class TracksController : Controller
     {
-        public IHttpResponse Create(IHttpRequest httpRequest)
+        public ActionResult Create(IHttpRequest httpRequest)
         {
             if (!IsLoggedIn(httpRequest))
             {
@@ -30,7 +31,7 @@ namespace IRunes.App.Controllers
         }
 
         [HttpPost(ActionName = "Create")]
-        public IHttpResponse CreateConfirm(IHttpRequest httpRequest)
+        public ActionResult CreateConfirm(IHttpRequest httpRequest)
         {
             if (!IsLoggedIn(httpRequest))
             {
@@ -68,7 +69,7 @@ namespace IRunes.App.Controllers
             return Redirect($"/Albums/Details?id={album.Id}");
         }
 
-        public IHttpResponse Details(IHttpRequest httpRequest)
+        public ActionResult Details(IHttpRequest httpRequest)
         {
             if (!IsLoggedIn(httpRequest))
             {

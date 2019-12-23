@@ -3,18 +3,19 @@ using SIS.HTTP.Responses;
 using SIS.MvcFramework;
 using SIS.MvcFramework.Attributes;
 using SIS.MvcFramework.Attributes.Http;
+using SIS.MvcFramework.Result;
 
 namespace IRunes.App.Controllers
 {
     public class HomeController : Controller
     {
         [HttpGet(Url = "/")]
-        public IHttpResponse IndexSlash(IHttpRequest httpRequest)
+        public ActionResult IndexSlash(IHttpRequest httpRequest)
         {
             return Index(httpRequest);
         }
 
-        public IHttpResponse Index(IHttpRequest httpRequest)
+        public ActionResult Index(IHttpRequest httpRequest)
         {
             if (IsLoggedIn(httpRequest))
             {

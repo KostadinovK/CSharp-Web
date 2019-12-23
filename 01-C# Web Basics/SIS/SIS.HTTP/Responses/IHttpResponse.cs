@@ -14,9 +14,9 @@ namespace SIS.HTTP.Responses
 
         byte[] Content { get; set; }
 
-        void AddHeader(HttpHeader header);
+        void AddHeader(string key, string value);
 
-        void AddCookie(HttpCookie cookie);
+        void AddCookie(string key, string value);
 
         byte[] GetBytes();
     }

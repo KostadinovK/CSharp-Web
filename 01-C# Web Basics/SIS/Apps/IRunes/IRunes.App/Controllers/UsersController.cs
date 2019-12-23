@@ -11,6 +11,7 @@ using SIS.HTTP.Responses;
 using SIS.MvcFramework;
 using SIS.MvcFramework.Attributes;
 using SIS.MvcFramework.Attributes.Http;
+using SIS.MvcFramework.Result;
 
 namespace IRunes.App.Controllers
 {
@@ -23,13 +24,13 @@ namespace IRunes.App.Controllers
             return Encoding.UTF8.GetString(sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password)));
         }
 
-        public IHttpResponse Register(IHttpRequest httpRequest)
+        public ActionResult Register(IHttpRequest httpRequest)
         {
             return this.View();
         }
 
         [HttpPost(ActionName = "Register")]
-        public IHttpResponse RegisterConfirm(IHttpRequest httpRequest)
+        public ActionResult RegisterConfirm(IHttpRequest httpRequest)
         {
             using (var context = new RunesDbContext())
             {
@@ -65,13 +66,13 @@ namespace IRunes.App.Controllers
             return Redirect("/Users/Login");
         }
 
-        public IHttpResponse Login(IHttpRequest httpRequest)
+        public ActionResult Login(IHttpRequest httpRequest)
         {
             return this.View();
         }
 
         [HttpPost(ActionName = "Login")]
-        public IHttpResponse LoginConfirm(IHttpRequest httpRequest)
+        public ActionResult LoginConfirm(IHttpRequest httpRequest)
         {
             using (var context = new RunesDbContext())
             {
@@ -91,7 +92,7 @@ namespace IRunes.App.Controllers
             return Redirect("/Home/Index");
         }
 
-        public IHttpResponse Logout(IHttpRequest httpRequest)
+        public ActionResult Logout(IHttpRequest httpRequest)
         {
             SignOut(httpRequest);
 

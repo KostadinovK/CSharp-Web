@@ -4,11 +4,12 @@ using System.IO;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Xml.Serialization;
 using SIS.HTTP.Enums;
 using SIS.HTTP.Requests;
 using SIS.HTTP.Responses;
+using SIS.MvcFramework.Extensions;
 using SIS.MvcFramework.Result;
-using SIS.WebServer.Result;
 
 namespace SIS.MvcFramework
 {
@@ -48,20 +49,40 @@ namespace SIS.MvcFramework
             return viewContent;
         }
 
-        protected IHttpResponse View([CallerMemberName] string view = null)
+        protected ActionResult View([CallerMemberName] string view = null)
         {
             var controllerName = this.GetType().Name.Replace("Controller", "");
             var viewName = view;
-            var content = File.ReadAllText("Views/" + controllerName + "/" + viewName + ".html");
+            var content = System.IO.File.ReadAllText("Views/" + controllerName + "/" + viewName + ".html");
 
             content = ParseTemplate(content);
             
             return new HtmlResult(content, HttpResponseStatusCode.Ok);
         }
 
-        protected IHttpResponse Redirect(string location)
+        protected ActionResult Redirect(string location)
         {
             return new RedirectResult(location);
+        }
+
+        protected ActionResult Xml(object obj)
+        {
+            return new XmlResult(obj.ToXml());
+        }
+
+        protected ActionResult Json(object obj)
+        {
+            return new JsonResult(obj.ToJson());
+        }
+
+        protected ActionResult File(byte[] fileContent)
+        {
+            return new FileResult(fileContent);
+        }
+
+        protected ActionResult NotFound(string message = "")
+        {
+            return new NotFoundResult(message); 
         }
     }
 }
