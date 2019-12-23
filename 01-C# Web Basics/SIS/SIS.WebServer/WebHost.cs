@@ -1,7 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text;
+using SIS.HTTP.Enums;
+using SIS.HTTP.Responses;
+using SIS.MvcFramework.Attributes;
 using SIS.WebServer;
+using SIS.WebServer.Results;
 using SIS.WebServer.Routing;
 
 namespace SIS.MvcFramework
@@ -10,13 +17,68 @@ namespace SIS.MvcFramework
     {
         public static void Start(IMvcApplication application)
         {
-            ServerRoutingTable serverRoutingTable = new ServerRoutingTable();
+            var serverRoutingTable = new ServerRoutingTable();
 
+            AutoRegisterRoutes(application, serverRoutingTable);
             application.ConfigureServices();
             application.Configure(serverRoutingTable);
 
             var server = new Server(8000, serverRoutingTable);
             server.Run();
+        }
+
+        private static void AutoRegisterRoutes(IMvcApplication application, IServerRoutingTable serverRoutingTable)
+        {
+            var assembly = application.GetType().Assembly;
+            var controllers = assembly
+                .GetTypes()
+                .Where(t => t.IsClass && !t.IsAbstract && typeof(Controller).IsAssignableFrom(t))
+                .ToList();
+
+            foreach (var controller in controllers)
+            {
+                var controllerName = controller.Name.Replace("Controller", "");
+
+                var actions = controller
+                    .GetMethods(BindingFlags.Instance | BindingFlags.Public)
+                    .Where(m => m.ReturnType == typeof(IHttpResponse) && !m.IsVirtual)
+                    .ToList();
+
+                foreach (var action in actions)
+                {
+                    var actionName = action.Name;
+                    var path = $"/{controllerName}/{actionName}";
+
+                    var attribute =
+                        action.GetCustomAttributes().LastOrDefault(x => x.GetType().IsSubclassOf(typeof(BaseHttpAttribute))) as BaseHttpAttribute;
+
+                    var httpMethod = HttpRequestMethod.Get;
+
+                    if (attribute != null)
+                    {
+                        httpMethod = attribute.Method;
+                    }
+
+                    if (attribute?.Url != null)
+                    {
+                        path = attribute.Url;
+                    }
+
+                    if (attribute?.ActionName != null)
+                    {
+                        path = $"/{controllerName}/{attribute.ActionName}";
+                    }
+
+                    Console.WriteLine($"{httpMethod} - {path}");
+                    serverRoutingTable.Add(httpMethod, path, request => 
+                    {
+                        var controllerInstance = Activator.CreateInstance(controller);
+                        var response = action.Invoke(controllerInstance, new object[] {request}) as IHttpResponse;
+
+                        return response;
+                    });
+                }
+            }
         }
     }
 }

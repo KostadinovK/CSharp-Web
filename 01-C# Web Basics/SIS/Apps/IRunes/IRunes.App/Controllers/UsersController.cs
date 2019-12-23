@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -7,10 +8,12 @@ using IRunes.Data;
 using IRunes.Models.Models;
 using SIS.HTTP.Requests;
 using SIS.HTTP.Responses;
+using SIS.MvcFramework;
+using SIS.MvcFramework.Attributes;
 
 namespace IRunes.App.Controllers
 {
-    public class UsersController : BaseController
+    public class UsersController : Controller
     {
         private string ComputeSha256Hash(string password)
         {
@@ -24,6 +27,7 @@ namespace IRunes.App.Controllers
             return this.View();
         }
 
+        [HttpPost(ActionName = "Register")]
         public IHttpResponse RegisterConfirm(IHttpRequest httpRequest)
         {
             using (var context = new RunesDbContext())
@@ -65,6 +69,7 @@ namespace IRunes.App.Controllers
             return this.View();
         }
 
+        [HttpPost(ActionName = "Login")]
         public IHttpResponse LoginConfirm(IHttpRequest httpRequest)
         {
             using (var context = new RunesDbContext())
@@ -79,9 +84,7 @@ namespace IRunes.App.Controllers
                     return Redirect("/Users/Register");
                 }
 
-                httpRequest.Session.AddParameter("username", user.Username);
-                httpRequest.Session.AddParameter("email", user.Email);
-                httpRequest.Session.AddParameter("id", user.Id);
+                SignIn(httpRequest, user.Id, user.Username, user.Email);
             }
 
             return Redirect("/Home/Index");
@@ -89,9 +92,18 @@ namespace IRunes.App.Controllers
 
         public IHttpResponse Logout(IHttpRequest httpRequest)
         {
-            httpRequest.Session.ClearParameters();
+            SignOut(httpRequest);
 
             return Redirect("/Home/Index");
+        }
+
+        protected bool IsValid(object obj)
+        {
+            var validationResults = new List<ValidationResult>();
+            var validationContext = new ValidationContext(obj);
+
+
+            return Validator.TryValidateObject(obj, validationContext, validationResults, true);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -7,10 +8,12 @@ using IRunes.Data;
 using IRunes.Models.Models;
 using SIS.HTTP.Requests;
 using SIS.HTTP.Responses;
+using SIS.MvcFramework;
+using SIS.MvcFramework.Attributes;
 
 namespace IRunes.App.Controllers
 {
-    public class TracksController : BaseController
+    public class TracksController : Controller
     {
         public IHttpResponse Create(IHttpRequest httpRequest)
         {
@@ -25,6 +28,7 @@ namespace IRunes.App.Controllers
             return View();
         }
 
+        [HttpPost(ActionName = "Create")]
         public IHttpResponse CreateConfirm(IHttpRequest httpRequest)
         {
             if (!IsLoggedIn(httpRequest))
@@ -83,6 +87,15 @@ namespace IRunes.App.Controllers
             ViewData.Add("Price", $"${track.Price:f2}");
 
             return View();
+        }
+
+        protected bool IsValid(object obj)
+        {
+            var validationResults = new List<ValidationResult>();
+            var validationContext = new ValidationContext(obj);
+
+
+            return Validator.TryValidateObject(obj, validationContext, validationResults, true);
         }
     }
 }

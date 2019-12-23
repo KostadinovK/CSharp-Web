@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
@@ -9,10 +10,12 @@ using IRunes.Models.Models;
 using Microsoft.EntityFrameworkCore;
 using SIS.HTTP.Requests;
 using SIS.HTTP.Responses;
+using SIS.MvcFramework;
+using SIS.MvcFramework.Attributes;
 
 namespace IRunes.App.Controllers
 {
-    public class AlbumsController : BaseController
+    public class AlbumsController : Controller
     {
         public IHttpResponse All(IHttpRequest httpRequest)
         {
@@ -57,6 +60,7 @@ namespace IRunes.App.Controllers
             return View();
         }
 
+        [HttpPost(ActionName = "Create")]
         public IHttpResponse CreateConfirm(IHttpRequest httpRequest)
         {
             if (!IsLoggedIn(httpRequest))
@@ -138,6 +142,15 @@ namespace IRunes.App.Controllers
             }
 
             return sb.ToString().TrimEnd();
+        }
+
+        protected bool IsValid(object obj)
+        {
+            var validationResults = new List<ValidationResult>();
+            var validationContext = new ValidationContext(obj);
+
+
+            return Validator.TryValidateObject(obj, validationContext, validationResults, true);
         }
     }
 }

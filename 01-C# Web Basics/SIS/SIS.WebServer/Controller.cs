@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Net;
 using System.Runtime.CompilerServices;
@@ -10,13 +9,13 @@ using SIS.HTTP.Requests;
 using SIS.HTTP.Responses;
 using SIS.WebServer.Result;
 
-namespace IRunes.App.Controllers
+namespace SIS.MvcFramework
 {
-    public abstract class BaseController
+    public abstract class Controller
     {
         protected Dictionary<string, object> ViewData { get; set; } = new Dictionary<string, object>();
 
-        protected BaseController()
+        protected Controller()
         {
            
         }
@@ -24,6 +23,18 @@ namespace IRunes.App.Controllers
         protected bool IsLoggedIn(IHttpRequest httpRequest)
         {
             return httpRequest.Session.ContainsParameter("username");
+        }
+
+        protected void SignIn(IHttpRequest httpRequest, string id, string username, string email)
+        {
+            httpRequest.Session.AddParameter("username", username);
+            httpRequest.Session.AddParameter("id", id);
+            httpRequest.Session.AddParameter("email", email);
+        }
+
+        protected void SignOut(IHttpRequest httpRequest)
+        {
+            httpRequest.Session.ClearParameters();
         }
 
         private string ParseTemplate(string viewContent)
@@ -50,14 +61,6 @@ namespace IRunes.App.Controllers
         protected IHttpResponse Redirect(string location)
         {
             return new RedirectResult(location);
-        }
-
-        protected bool IsValid(object obj)
-        {
-            var validationResults = new List<ValidationResult>();
-            var validationContext = new ValidationContext(obj);
-
-            return Validator.TryValidateObject(obj, validationContext, validationResults, true);
         }
     }
 }
