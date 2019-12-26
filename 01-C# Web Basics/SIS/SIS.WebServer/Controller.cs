@@ -58,11 +58,15 @@ namespace SIS.MvcFramework
         {
             var controllerName = this.GetType().Name.Replace("Controller", "");
             var viewName = view;
-            var content = System.IO.File.ReadAllText("Views/" + controllerName + "/" + viewName + ".html");
+            var viewContent = System.IO.File.ReadAllText("Views/" + controllerName + "/" + viewName + ".html");
+            viewContent = ParseTemplate(viewContent);
 
-            content = ParseTemplate(content);
-            
-            return new HtmlResult(content, HttpResponseStatusCode.Ok);
+            var layoutContent = System.IO.File.ReadAllText("Views/_Layout.html");
+            layoutContent = ParseTemplate(layoutContent);
+
+            layoutContent = layoutContent.Replace("@RenderBody()", viewContent);
+
+            return new HtmlResult(layoutContent);
         }
 
         protected ActionResult Redirect(string location)
