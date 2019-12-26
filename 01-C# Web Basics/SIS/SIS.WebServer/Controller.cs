@@ -5,11 +5,14 @@ using SIS.HTTP.Requests;
 using SIS.MvcFramework.Extensions;
 using SIS.MvcFramework.Identity;
 using SIS.MvcFramework.Result;
+using SIS.MvcFramework.ViewEngine;
 
 namespace SIS.MvcFramework
 {
     public abstract class Controller
     {
+
+        private IViewEngine viewEngine = new SisViewEngine();
         protected Dictionary<string, object> ViewData { get; set; } = new Dictionary<string, object>();
 
         public IHttpRequest Request { get; set; }
@@ -44,25 +47,21 @@ namespace SIS.MvcFramework
             Request.Session.ClearParameters();
         }
 
-        private string ParseTemplate(string viewContent)
+        protected ActionResult View([CallerMemberName] string view = null)
         {
-            foreach (var param in ViewData)
-            {
-                viewContent = viewContent.Replace($"@Model.{param.Key}", param.Value.ToString());
-            }
-
-            return viewContent;
+            return this.View<object>(null, view);
         }
 
-        protected ActionResult View([CallerMemberName] string view = null)
+        protected ActionResult View<T>(T model = null, [CallerMemberName] string view = null)
+            where T : class
         {
             var controllerName = this.GetType().Name.Replace("Controller", "");
             var viewName = view;
             var viewContent = System.IO.File.ReadAllText("Views/" + controllerName + "/" + viewName + ".html");
-            viewContent = ParseTemplate(viewContent);
+            viewContent = viewEngine.GetHtml(viewContent, model);
 
             var layoutContent = System.IO.File.ReadAllText("Views/_Layout.html");
-            layoutContent = ParseTemplate(layoutContent);
+            layoutContent = viewEngine.GetHtml(layoutContent, model);
 
             layoutContent = layoutContent.Replace("@RenderBody()", viewContent);
 

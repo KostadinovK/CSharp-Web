@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Text;
+using IRunes.App.ViewModels;
 using IRunes.Data;
 using IRunes.Models.Models;
 using IRunes.Services;
@@ -81,7 +82,7 @@ namespace IRunes.App.Controllers
             ViewData.Add("Name", WebUtility.UrlDecode(track.Name));
             ViewData.Add("Price", $"${track.Price:f2}");
 
-            return View();
+            return View(new AlbumDetailsViewModel(){AlbumId = albumId});
         }
 
         protected bool IsValid(object obj)
