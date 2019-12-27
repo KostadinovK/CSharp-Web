@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using SIS.Common;
 using SIS.HTTP.Common;
+using SIS.HTTP.Cookies.Contracts;
 
 namespace SIS.HTTP.Cookies
 {
@@ -16,9 +18,9 @@ namespace SIS.HTTP.Cookies
 
         public void AddCookie(HttpCookie httpCookie)
         {
-            CoreValidator.ThrowIfNull(httpCookie, nameof(httpCookie));
+            httpCookie.ThrowIfNull(nameof(httpCookie));
 
-            if (!ContainsCookie(httpCookie.Key))
+            if (!httpCookies.ContainsKey(httpCookie.Key))
             {
                 this.httpCookies.Add(httpCookie.Key, httpCookie);
             }
@@ -26,14 +28,14 @@ namespace SIS.HTTP.Cookies
 
         public bool ContainsCookie(string key)
         {
-            CoreValidator.ThrowIfNullOrEmpty(key, nameof(key));
+            key.ThrowIfNullOrEmpty(nameof(key));
 
             return this.httpCookies.ContainsKey(key);
         }
 
         public HttpCookie GetCookie(string key)
         {
-            CoreValidator.ThrowIfNullOrEmpty(key, nameof(key));
+            key.ThrowIfNullOrEmpty(nameof(key));
 
             // TODO: Validation for existing parameter (maybe throw exception)
 

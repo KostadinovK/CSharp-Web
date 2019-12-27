@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using IRunes.App.Controllers;
-using IRunes.Data;
-using SIS.HTTP.Enums;
+﻿using IRunes.Data;
+
 using SIS.MvcFramework;
-using SIS.WebServer;
-using SIS.WebServer.Routing;
+using SIS.MvcFramework.Routing;
 
 namespace IRunes.App
 {
@@ -18,7 +13,6 @@ namespace IRunes.App
             {
                 context.Database.EnsureCreated();
             }
-
         }
 
         public void ConfigureServices()

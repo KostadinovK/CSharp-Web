@@ -1,39 +1,39 @@
 ﻿<header>
-    <nav class="navbar navbar-expand-lg navbar-light bg-success">
-        <a class="navbar-brand text-white" href="/Home/Index">IRunes</a>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <a class="navbar-brand" href="#">IRunes</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item active">
-                    <a class="nav-link text-white" href="/Home/Index">Home</a>
+                    <a class="nav-link" href="/">Home</a>
                 </li>
                 <li class="nav-item active">
-                    <a class="nav-link text-white" href="/Users/Login">Login</a>
+                    <a class="nav-link" href="/Users/Login">Login</a>
                 </li>
                 <li class="nav-item active">
-                    <a class="nav-link text-white" href="/Users/Register">Register</a>
+                    <a class="nav-link" href="/Users/Register">Register</a>
                 </li>
             </ul>
         </div>
     </nav>
 </header>
-<hr style="height: 2px" class="bg-success" />
-<main class="container-fluid w-50 mx-auto">
-    <h1 class="text-success text-center">Login</h1>
-    <hr style="height: 2px" class="bg-success" />
-    <form action="/Users/Login" method="POST">
+<hr class="bg-success" style="height: 2px" />
+<main>
+    <h1 class="text-center text-success">Login</h1>
+    <hr class="bg-success w-50" style="height: 2px" />
+    <form class="w-50 mx-auto" action="/Users/Login" method="POST">
         <div class="form-group">
             <label for="username">Username / Email</label>
-            <input class="form-control" type="text" id="username" name="username" placeholder="Username / Email..." />
+            <input type="text" class="form-control" id="username" name="username" placeholder="Username / Email..." />
         </div>
         <div class="form-group">
             <label for="password">Password</label>
-            <input class="form-control" type="password" id="password" name="password" placeholder="Password..." />
+            <input type="password" class="form-control" id="password" name="password" placeholder="Password..." />
         </div>
-        <div>
-            <button type="submit" class="btn btn-success d-flex mx-auto">Login</button>
+        <div class="d-flex justify-content-center mt-3">
+            <button type="submit" class="btn bg-success text-white">Login</button>
         </div>
     </form>
 </main>

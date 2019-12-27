@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Responses\Parameters\" />
+    <ProjectReference Include="..\SIS.Common\SIS.Common.csproj" />
   </ItemGroup>
 
 </Project>

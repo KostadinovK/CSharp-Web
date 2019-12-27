@@ -1,6 +1,8 @@
 ﻿using System.Text;
+using SIS.Common;
 using SIS.HTTP.Common;
 using SIS.HTTP.Cookies;
+using SIS.HTTP.Cookies.Contracts;
 using SIS.HTTP.Enums;
 using SIS.HTTP.Extensions;
 using SIS.HTTP.Headers;
@@ -18,7 +20,7 @@ namespace SIS.HTTP.Responses
 
         public HttpResponse(HttpResponseStatusCode statusCode) : this()
         {
-            CoreValidator.ThrowIfNull(statusCode, nameof(statusCode));
+            statusCode.ThrowIfNull(nameof(statusCode));
             this.StatusCode = statusCode;
         }
 
@@ -30,27 +32,14 @@ namespace SIS.HTTP.Responses
 
         public byte[] Content { get; set; }
 
-        public void AddHeader(string key, string value)
+        public void AddHeader(HttpHeader header)
         {
-            CoreValidator.ThrowIfNullOrEmpty(key, nameof(key));
-            CoreValidator.ThrowIfNullOrEmpty(value, nameof(value));
-
-            this.Headers.AddHeader(new HttpHeader(key, value));
-        }
-
-        public void AddCookie(string key, string value)
-        {
-            CoreValidator.ThrowIfNullOrEmpty(key, nameof(key));
-            CoreValidator.ThrowIfNullOrEmpty(value, nameof(value));
-
-            this.Cookies.AddCookie(new HttpCookie(key, value));
+            this.Headers.AddHeader(header);
         }
 
         public void AddCookie(HttpCookie cookie)
         {
-            CoreValidator.ThrowIfNull(cookie, nameof(cookie));
-
-            Cookies.AddCookie(cookie);
+            this.Cookies.AddCookie(cookie);
         }
 
         public byte[] GetBytes()

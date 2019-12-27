@@ -1,73 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using IRunes.Data;
+
+using IRunes.Models;
 using IRunes.Models.Models;
 using IRunes.Services;
-using SIS.HTTP.Requests;
-using SIS.HTTP.Responses;
 using SIS.MvcFramework;
 using SIS.MvcFramework.Attributes;
-using SIS.MvcFramework.Attributes.Http;
+using SIS.MvcFramework.Attributes.Action;
 using SIS.MvcFramework.Result;
 
 namespace IRunes.App.Controllers
 {
     public class UsersController : Controller
     {
-        private readonly UserService userService;
+        private readonly IUserService userService;
 
         public UsersController()
         {
-            userService = new UserService();
+            this.userService = new UserService();
         }
 
-        private string ComputeSha256Hash(string password)
+        [NonAction]
+        private string HashPassword(string password)
         {
-            using SHA256 sha256Hash = SHA256.Create();
-            
-            return Encoding.UTF8.GetString(sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password)));
-        }
-
-        public ActionResult Register()
-        {
-            return this.View();
-        }
-
-        [HttpPost(ActionName = "Register")]
-        public ActionResult RegisterConfirm()
-        {
-            var username = ((ISet<string>)Request.FormData["username"]).FirstOrDefault();
-            var password = ((ISet<string>)Request.FormData["password"]).FirstOrDefault();
-            var confirmPassword = ((ISet<string>)Request.FormData["confirmPassword"]).FirstOrDefault();
-            var email = ((ISet<string>)Request.FormData["email"]).FirstOrDefault();
-
-            if (password != confirmPassword)
+            using (SHA256 sha256Hash = SHA256.Create())
             {
-                return Redirect("/Users/Register");
+                return Encoding.UTF8.GetString(sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password)));
             }
-
-            var passwordHashed = ComputeSha256Hash(password);
-
-            var user = new User
-            {
-                Id = Guid.NewGuid().ToString(),
-                Username = username,
-                Password = passwordHashed,
-                Email = email
-            };
-
-            if (!IsValid(user))
-            {
-                return Redirect("/Users/Register");
-            }
-
-            userService.CreateUser(user);
-
-            return Redirect("/Users/Login");
         }
 
         public ActionResult Login()
@@ -78,36 +39,56 @@ namespace IRunes.App.Controllers
         [HttpPost(ActionName = "Login")]
         public ActionResult LoginConfirm()
         {
-            var username = ((ISet<string>)Request.FormData["username"]).FirstOrDefault();
-            var password = ((ISet<string>)Request.FormData["password"]).FirstOrDefault();
+            string username = ((ISet<string>)this.Request.FormData["username"]).FirstOrDefault();
+            string password = ((ISet<string>)this.Request.FormData["password"]).FirstOrDefault();
 
-            var user = userService.GetUserByUsernameAndPassword(username, ComputeSha256Hash(password));
+            User userFromDb = this.userService.GetUserByUsernameAndPassword(username, this.HashPassword(password));
 
-            if (user == null)
+            if (userFromDb == null)
             {
-                return Redirect("/Users/Register");
+                return this.Redirect("/Users/Login");
             }
 
-            SignIn(user.Id, user.Username, user.Email);
+            this.SignIn(userFromDb.Id, userFromDb.Username, userFromDb.Email);
 
+            return this.Redirect("/");
+        }
 
-            return Redirect("/Home/Index");
+        public ActionResult Register()
+        {
+            return this.View();
+        }
+
+        [HttpPost(ActionName = "Register")]
+        public ActionResult RegisterConfirm()
+        {
+            string username = ((ISet<string>)this.Request.FormData["username"]).FirstOrDefault();
+            string password = ((ISet<string>)this.Request.FormData["password"]).FirstOrDefault();
+            string confirmPassword = ((ISet<string>)this.Request.FormData["confirmPassword"]).FirstOrDefault();
+            string email = ((ISet<string>)this.Request.FormData["email"]).FirstOrDefault();
+
+            if (password != confirmPassword)
+            {
+                return this.Redirect("/Users/Register");
+            }
+
+            User user = new User
+            {
+                Username = username,
+                Password = this.HashPassword(password),
+                Email = email
+            };
+
+            this.userService.CreateUser(user);
+
+            return this.Redirect("/Users/Login");
         }
 
         public ActionResult Logout()
         {
-            SignOut();
+            this.SignOut();
 
-            return Redirect("/Home/Index");
-        }
-
-        protected bool IsValid(object obj)
-        {
-            var validationResults = new List<ValidationResult>();
-            var validationContext = new ValidationContext(obj);
-
-
-            return Validator.TryValidateObject(obj, validationContext, validationResults, true);
+            return this.Redirect("/");
         }
     }
 }
