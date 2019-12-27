@@ -1,18 +1,28 @@
 ﻿using System.Collections.Concurrent;
 using SIS.HTTP.Sessions;
+using SIS.MvcFramework.Sessions;
 
 namespace SIS.WebServer.Sessions
 {
-    public class HttpSessionStorage
+    public class HttpSessionStorage : IHttpSessionStorage
     {
         public const string SessionCookieKey = "SIS_ID";
 
-        private static readonly ConcurrentDictionary<string, IHttpSession> httpSessions =
-            new ConcurrentDictionary<string, IHttpSession>();
+        private readonly ConcurrentDictionary<string, IHttpSession> httpSessions;
 
-        public static IHttpSession GetSession(string id)
+        public HttpSessionStorage()
+        {
+            httpSessions = new ConcurrentDictionary<string, IHttpSession>();
+        }
+
+        public IHttpSession GetSession(string id)
         {
             return httpSessions.GetOrAdd(id, _ => new HttpSession(id));
+        }
+
+        public bool ContainsSession(string id)
+        {
+            return httpSessions.ContainsKey(id);
         }
     }
 }

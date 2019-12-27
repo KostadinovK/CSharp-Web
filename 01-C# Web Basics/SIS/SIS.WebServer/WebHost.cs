@@ -11,6 +11,7 @@ using SIS.MvcFramework.Attributes.Security;
 using SIS.MvcFramework.Result;
 using SIS.WebServer;
 using SIS.WebServer.Routing;
+using SIS.WebServer.Sessions;
 
 namespace SIS.MvcFramework
 {
@@ -19,12 +20,13 @@ namespace SIS.MvcFramework
         public static void Start(IMvcApplication application)
         {
             var serverRoutingTable = new ServerRoutingTable();
+            var httpSessionStorage = new HttpSessionStorage();
 
             AutoRegisterRoutes(application, serverRoutingTable);
             application.ConfigureServices();
             application.Configure(serverRoutingTable);
 
-            var server = new Server(8000, serverRoutingTable);
+            var server = new Server(8000, serverRoutingTable, httpSessionStorage);
             server.Run();
         }
 

@@ -46,6 +46,13 @@ namespace SIS.HTTP.Responses
             this.Cookies.AddCookie(new HttpCookie(key, value));
         }
 
+        public void AddCookie(HttpCookie cookie)
+        {
+            CoreValidator.ThrowIfNull(cookie, nameof(cookie));
+
+            Cookies.AddCookie(cookie);
+        }
+
         public byte[] GetBytes()
         {
             byte[] httpResponseBytesWithoutBody = Encoding.UTF8.GetBytes(this.ToString());
