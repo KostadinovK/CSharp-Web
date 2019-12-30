@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using  IRunes;
 using IRunes.App.ViewModels;
 using IRunes.App.ViewModels.Tracks;
 using IRunes.Models;
