@@ -20,10 +20,7 @@ namespace SIS.HTTP.Cookies
         {
             httpCookie.ThrowIfNull(nameof(httpCookie));
 
-            if (!httpCookies.ContainsKey(httpCookie.Key))
-            {
-                this.httpCookies.Add(httpCookie.Key, httpCookie);
-            }
+            this.httpCookies.Add(httpCookie.Key, httpCookie);
         }
 
         public bool ContainsCookie(string key)

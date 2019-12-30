@@ -4,7 +4,6 @@ using System.Security.Cryptography;
 using System.Text;
 
 using IRunes.Models;
-using IRunes.Models.Models;
 using IRunes.Services;
 using SIS.MvcFramework;
 using SIS.MvcFramework.Attributes;

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 
 namespace SIS.MvcFramework.Logging
@@ -9,7 +7,7 @@ namespace SIS.MvcFramework.Logging
     {
         public void Log(string message)
         {
-            Console.WriteLine($"[{DateTime.Now:yy-MM-dd}] [{Thread.CurrentThread.ManagedThreadId}] {message}");
+            Console.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] [#{Thread.CurrentThread.ManagedThreadId}] {message}");
         }
     }
 }

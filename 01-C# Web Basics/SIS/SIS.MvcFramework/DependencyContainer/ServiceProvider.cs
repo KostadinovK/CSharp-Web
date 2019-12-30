@@ -3,20 +3,22 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace SIS.MvcFramework.DependencyContainer
 {
     public class ServiceProvider : IServiceProvider
     {
-        private readonly IDictionary<Type, Type> dependencyContainer = new ConcurrentDictionary<Type, Type>();
+        private readonly IDictionary<Type, Type>
+            dependencyContainer = new ConcurrentDictionary<Type, Type>();
 
         public void Add<TSource, TDestination>()
             where TDestination : TSource
         {
-            dependencyContainer[typeof(TSource)] = typeof(TDestination);
+            this.dependencyContainer[typeof(TSource)] = typeof(TDestination);
         }
 
+        // CreateInstance(typeof(ILogger))
+        // CreateInstance(typeof(HomeController))
         public object CreateInstance(Type type)
         {
             if (dependencyContainer.ContainsKey(type))
@@ -24,24 +26,23 @@ namespace SIS.MvcFramework.DependencyContainer
                 type = dependencyContainer[type];
             }
 
-            var constructor = type.GetConstructors(BindingFlags.Public | BindingFlags.Instance).OrderBy(x => x.GetParameters().Count()).FirstOrDefault();
+            var constructor = type.GetConstructors(BindingFlags.Public | BindingFlags.Instance)
+                .OrderBy(x => x.GetParameters().Count()).FirstOrDefault();
 
-            if(constructor == null)
+            if (constructor == null)
             {
                 return null;
             }
 
             var parameters = constructor.GetParameters();
-            var parametersInstances = new List<object>();
-            
+            var parameterInstances = new List<object>();
             foreach (var parameter in parameters)
             {
                 var parameterInstance = CreateInstance(parameter.ParameterType);
-                parametersInstances.Add(parameterInstance);
+                parameterInstances.Add(parameterInstance);
             }
 
-            var obj = constructor.Invoke(parametersInstances.ToArray());
-
+            var obj = constructor.Invoke(parameterInstances.ToArray());
             return obj;
         }
     }

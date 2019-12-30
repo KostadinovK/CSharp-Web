@@ -1,33 +1,33 @@
-﻿using System;
+﻿using SIS.MvcFramework.ViewEngine;
+
 using System.Collections.Generic;
 using System.IO;
-using SIS.MvcFramework.Identity;
-using SIS.MvcFramework.ViewEngine;
+
 using Xunit;
 
 namespace SIS.MvcFramework.Tests
 {
     public class TestSisViewEngine
     {
-       [Theory]
-       [InlineData("TestWithoutCSharpCode")]
-       [InlineData("UseForForeachAndIf")]
-       [InlineData("UseModelData")]
+        [Theory]
+        [InlineData("TestWithoutCSharpCode")]
+        [InlineData("UseForForeachAndIf")]
+        [InlineData("UseModelData")]
         public void TestGetHtml(string testFileName)
-       {
-           IViewEngine viewEngine = new SisViewEngine();
-           var viewFileName = $"ViewTests/{testFileName}.html";
-           var expectedResultFileName = $"ViewTests/{testFileName}.Result.html";
+        {
+            IViewEngine viewEngine = new SisViewEngine();
+            var viewFileName = $"ViewTests/{testFileName}.html";
+            var expectedResultFileName = $"ViewTests/{testFileName}.Result.html";
 
-           var viewContent = File.ReadAllText(viewFileName);
-           var expectedResult = File.ReadAllText(expectedResultFileName);
+            var viewContent = File.ReadAllText(viewFileName);
+            var expectedResult = File.ReadAllText(expectedResultFileName);
 
-           var actualResult = viewEngine.GetHtml<TestViewModel>(viewContent, new TestViewModel(){
-               StringValue = "str",
-               ListValue = new List<string> { "123", "val1", string.Empty}
-           }, new Principal());
-
-           Assert.Equal(expectedResult, actualResult);
-       }
+            var actualResult = viewEngine.GetHtml<object>(viewContent, new TestViewModel()
+            {
+                StringValue = "str",
+                ListValues = new List<string> { "123", "val1", string.Empty },
+            }, new Identity.Principal() { });
+            Assert.Equal(expectedResult.TrimEnd(), actualResult.TrimEnd());
+        }
     }
 }

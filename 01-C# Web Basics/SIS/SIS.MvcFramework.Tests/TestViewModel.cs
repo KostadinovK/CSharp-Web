@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace SIS.MvcFramework.Tests
 {
@@ -8,6 +6,6 @@ namespace SIS.MvcFramework.Tests
     {
         public string StringValue { get; set; }
 
-        public IEnumerable<string> ListValue { get; set; }
+        public IEnumerable<string> ListValues { get; set; }
     }
 }

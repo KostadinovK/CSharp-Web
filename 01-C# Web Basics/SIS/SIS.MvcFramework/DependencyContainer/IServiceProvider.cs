@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SIS.MvcFramework.DependencyContainer
 {
@@ -11,6 +9,6 @@ namespace SIS.MvcFramework.DependencyContainer
 
         object CreateInstance(Type type);
 
-        //T CreateInstance<T>();
+        // T CreateInstance<T>();
     }
 }

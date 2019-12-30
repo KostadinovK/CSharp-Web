@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using IRunes.Data;
-using IRunes.Models.Models;
+using IRunes.Models;
 
 namespace IRunes.Services
 {
@@ -11,14 +8,15 @@ namespace IRunes.Services
     {
         private readonly RunesDbContext context;
 
-        public TrackService()
+        public TrackService(RunesDbContext runesDbContext)
         {
-            context = new RunesDbContext();
+            this.context = runesDbContext;
         }
 
         public Track GetTrackById(string trackId)
         {
-            return context.Tracks.SingleOrDefault(t => t.Id == trackId);
+            return this.context.Tracks
+                .SingleOrDefault(track => track.Id == trackId);
         }
     }
 }

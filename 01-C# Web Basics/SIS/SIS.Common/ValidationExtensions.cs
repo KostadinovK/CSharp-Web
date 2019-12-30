@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace SIS.Common
+﻿namespace SIS.Common
 {
+    using System;
+
     public static class ValidationExtensions
     {
         public static void ThrowIfNull(this object obj, string name)

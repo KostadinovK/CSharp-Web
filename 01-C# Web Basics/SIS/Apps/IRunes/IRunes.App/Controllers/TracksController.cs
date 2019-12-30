@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using IRunes.App.ViewModels;
 using IRunes.Models;
-using IRunes.Models.Models;
 using IRunes.Services;
+using Microsoft.Extensions.Logging;
 using SIS.MvcFramework;
 using SIS.MvcFramework.Attributes;
 using SIS.MvcFramework.Attributes.Security;
@@ -19,7 +18,7 @@ namespace IRunes.App.Controllers
 
         private readonly IAlbumService albumService;
 
-        public TracksController(IAlbumService albumService, ITrackService trackService)
+        public TracksController(ITrackService trackService, IAlbumService albumService)
         {
             this.trackService = trackService;
             this.albumService = albumService;
@@ -28,7 +27,7 @@ namespace IRunes.App.Controllers
         [Authorize]
         public ActionResult Create()
         {
-            string albumId = this.Request.QueryData["albumId"].ToString();
+            string albumId = this.Request.QueryData["albumId"].FirstOrDefault();
 
             return this.View(new TrackCreateViewModel{ AlbumId = albumId });
         }
@@ -37,10 +36,10 @@ namespace IRunes.App.Controllers
         [HttpPost(ActionName = "Create")]
         public ActionResult CreateConfirm()
         {
-            string albumId = this.Request.QueryData["albumId"].ToString();
-            string name = ((ISet<string>)this.Request.FormData["name"]).FirstOrDefault();
-            string link = ((ISet<string>)this.Request.FormData["link"]).FirstOrDefault();
-            string price = ((ISet<string>)this.Request.FormData["price"]).FirstOrDefault();
+            string albumId = this.Request.QueryData["albumId"].FirstOrDefault();
+            string name = this.Request.FormData["name"].FirstOrDefault();
+            string link = this.Request.FormData["link"].FirstOrDefault();
+            string price = this.Request.FormData["price"].FirstOrDefault();
 
             Track trackForDb = new Track
             {
@@ -60,8 +59,8 @@ namespace IRunes.App.Controllers
         [Authorize]
         public ActionResult Details()
         {
-            string albumId = this.Request.QueryData["albumId"].ToString();
-            string trackId = this.Request.QueryData["trackId"].ToString();
+            string albumId = this.Request.QueryData["albumId"].FirstOrDefault();
+            string trackId = this.Request.QueryData["trackId"].FirstOrDefault();
 
             Track trackFromDb = this.trackService.GetTrackById(trackId);
 
@@ -72,7 +71,6 @@ namespace IRunes.App.Controllers
 
             TrackDetailsViewModel trackDetailsViewModel = ModelMapper.ProjectTo<TrackDetailsViewModel>(trackFromDb);
             trackDetailsViewModel.AlbumId = albumId;
-            trackDetailsViewModel.Name = WebUtility.UrlDecode(trackDetailsViewModel.Name);
 
             return this.View(trackDetailsViewModel);
         }

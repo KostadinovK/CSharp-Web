@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using IRunes.Data;
-using IRunes.Models.Models;
+using IRunes.Models;
 
 namespace IRunes.Services
 {
@@ -11,23 +8,23 @@ namespace IRunes.Services
     {
         private readonly RunesDbContext context;
 
-        public UserService()
+        public UserService(RunesDbContext runesDbContext)
         {
-            context = new RunesDbContext();
+            this.context = runesDbContext;
         }
 
         public User CreateUser(User user)
         {
-            user = context.Users.Add(user).Entity;
-            context.SaveChanges();
+            user = this.context.Users.Add(user).Entity;
+            this.context.SaveChanges();
 
             return user;
         }
 
         public User GetUserByUsernameAndPassword(string username, string password)
         {
-            return context.Users.SingleOrDefault(u =>
-                (u.Username == username || u.Email == username) && u.Password == password);
+            return this.context.Users.SingleOrDefault(user => (user.Username == username || user.Email == username)
+                                                              && user.Password == password);
         }
     }
 }

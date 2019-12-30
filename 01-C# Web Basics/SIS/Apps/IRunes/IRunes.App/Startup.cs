@@ -1,5 +1,6 @@
 ﻿using IRunes.Data;
 using IRunes.Services;
+using Microsoft.Extensions.Logging;
 using SIS.MvcFramework;
 using SIS.MvcFramework.DependencyContainer;
 using SIS.MvcFramework.Routing;

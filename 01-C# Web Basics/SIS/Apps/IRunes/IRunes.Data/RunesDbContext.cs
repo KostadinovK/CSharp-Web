@@ -1,4 +1,4 @@
-﻿using IRunes.Models.Models;
+﻿using IRunes.Models;
 
 namespace IRunes.Data
 {
@@ -6,32 +6,33 @@ namespace IRunes.Data
 
     public class RunesDbContext : DbContext
     {
-        public RunesDbContext() : base()
-        {
-
-        }
-
         public DbSet<User> Users { get; set; }
 
-        public DbSet<Album> Albums { get; set; }
-
         public DbSet<Track> Tracks { get; set; }
+
+        public DbSet<Album> Albums { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(ConnectionConfiguration.ConnectionString);
+
             base.OnConfiguring(optionsBuilder);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<User>()
+                .HasKey(user => user.Id);
+
             modelBuilder.Entity<Track>()
-                .HasOne(t => t.Album)
-                .WithMany(a => a.Tracks)
-                .HasForeignKey(t => t.AlbumId);
+                .HasKey(track => track.Id);
+
+            modelBuilder.Entity<Album>()
+                .HasKey(album => album.Id);
+            modelBuilder.Entity<Album>()
+                .HasMany(album => album.Tracks);
 
             base.OnModelCreating(modelBuilder);
         }
     }
 }
-

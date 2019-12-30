@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using IRunes.Data;
-using IRunes.Models.Models;
+using IRunes.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace IRunes.Services
@@ -12,9 +10,9 @@ namespace IRunes.Services
     {
         private readonly RunesDbContext context;
 
-        public AlbumService()
+        public AlbumService(RunesDbContext runesDbContext)
         {
-            context = new RunesDbContext();
+            this.context = runesDbContext;
         }
 
         public Album CreateAlbum(Album album)
@@ -25,6 +23,26 @@ namespace IRunes.Services
             return album;
         }
 
+        public bool AddTrackToAlbum(string albumId, Track trackForDb)
+        {
+            Album albumFromDb = this.GetAlbumById(albumId);
+
+            if (albumFromDb == null)
+            {
+                return false;
+            }
+
+            albumFromDb.Tracks.Add(trackForDb);
+            albumFromDb.Price = (albumFromDb.Tracks
+                                     .Select(track => track.Price)
+                                     .Sum() * 87) / 100;
+
+            this.context.Update(albumFromDb);
+            this.context.SaveChanges();
+
+            return true;
+        }
+
         public ICollection<Album> GetAllAlbums()
         {
             return context.Albums.ToList();
@@ -33,26 +51,8 @@ namespace IRunes.Services
         public Album GetAlbumById(string id)
         {
             return context.Albums
-                .Include(a => a.Tracks)
-                .SingleOrDefault(a => a.Id == id);
-        }
-
-        public bool AddTrackToAlbum(string albumId, Track track)
-        {
-            var album = GetAlbumById(albumId);
-
-            if (album == null)
-            {
-                return false;
-            }
-
-            album.Tracks.Add(track);
-            album.Price = album.Tracks.Sum(t => t.Price) * 0.87m;
-
-            context.Update(album);
-            context.SaveChanges();
-
-            return true;
+                .Include(album => album.Tracks)
+                .SingleOrDefault(album => album.Id == id);
         }
     }
 }

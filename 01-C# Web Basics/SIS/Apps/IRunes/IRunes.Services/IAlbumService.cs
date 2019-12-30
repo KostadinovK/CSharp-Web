@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using IRunes.Models.Models;
+﻿using System.Collections.Generic;
+using IRunes.Models;
 
 namespace IRunes.Services
 {
@@ -8,10 +7,10 @@ namespace IRunes.Services
     {
         Album CreateAlbum(Album album);
 
+        bool AddTrackToAlbum(string albumId, Track track);
+
         ICollection<Album> GetAllAlbums();
 
         Album GetAlbumById(string id);
-
-        bool AddTrackToAlbum(string albumId, Track track);
     }
 }
