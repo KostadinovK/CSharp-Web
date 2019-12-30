@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Reflection;
 using SIS.HTTP.Enums;
 using SIS.HTTP.Responses;
@@ -7,9 +6,11 @@ using SIS.MvcFramework.Attributes;
 using SIS.MvcFramework.Attributes.Action;
 using SIS.MvcFramework.Attributes.Security;
 using SIS.MvcFramework.Result;
-using SIS.MvcFramework;
+using SIS.MvcFramework.DependencyContainer;
+using SIS.MvcFramework.Logging;
 using SIS.MvcFramework.Routing;
 using SIS.MvcFramework.Sessions;
+using IServiceProvider = SIS.MvcFramework.DependencyContainer.IServiceProvider;
 
 namespace SIS.MvcFramework
 {
@@ -19,16 +20,18 @@ namespace SIS.MvcFramework
         {
             IServerRoutingTable serverRoutingTable = new ServerRoutingTable();
             IHttpSessionStorage httpSessionStorage = new HttpSessionStorage();
+            IServiceProvider serviceProvider = new ServiceProvider();
+            serviceProvider.Add<ILogger, ConsoleLogger>();
 
-            AutoRegisterRoutes(application, serverRoutingTable);
-            application.ConfigureServices();
+            AutoRegisterRoutes(application, serverRoutingTable, serviceProvider);
+            application.ConfigureServices(serviceProvider);
             application.Configure(serverRoutingTable);
             var server = new Server(8000, serverRoutingTable, httpSessionStorage);
             server.Run();
         }
 
         private static void AutoRegisterRoutes(
-            IMvcApplication application, IServerRoutingTable serverRoutingTable)
+            IMvcApplication application, IServerRoutingTable serverRoutingTable, IServiceProvider serviceProvider)
         {
             var controllers = application.GetType().Assembly.GetTypes()
                 .Where(type => type.IsClass && !type.IsAbstract
@@ -67,8 +70,8 @@ namespace SIS.MvcFramework
                     serverRoutingTable.Add(httpMethod, path, request =>
                     {
                         // request => new UsersController().Login(request)
-                        var controllerInstance = Activator.CreateInstance(controller);
-                        ((Controller)controllerInstance).Request = request;
+                        var controllerInstance = serviceProvider.CreateInstance(controller) as Controller;
+                        controllerInstance.Request = request;
 
                         // Security Authorization - TODO: Refactor this
                         var controllerPrincipal = ((Controller)controllerInstance).User;
@@ -85,16 +88,9 @@ namespace SIS.MvcFramework
                         return response;
                     });
 
-                    Console.WriteLine(httpMethod + " " + path);
+                    System.Console.WriteLine(httpMethod + " " + path);
                 }
             }
-            // Reflection
-            // Assembly
-            // typeof(Server).GetMethods()
-            // sb.GetType().GetMethods();
-            // Activator.CreateInstance(typeof(Server))
-            var sb = DateTime.UtcNow;
-
         }
     }
 }

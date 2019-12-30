@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using System;
 using System.Collections;
@@ -59,7 +60,7 @@ namespace AppViewCodeNamespace
         private string GetCSharpCode(string viewContent)
         {
             // TODO: { var a = "Niki"; }
-            var lines = viewContent.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            var lines = viewContent.Split(new char[] { '\n', '\r' });
             var csharpCode = new StringBuilder();
             var supportedOperators = new[] { "for", "if", "else" };
             var csharpCodeRegex = new Regex(@"[^\s<""]+", RegexOptions.Compiled);

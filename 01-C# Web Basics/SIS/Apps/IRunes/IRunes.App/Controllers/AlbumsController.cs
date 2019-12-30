@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using IRunes.App.ViewModels;
-using IRunes.Models;
 using IRunes.Models.Models;
 using IRunes.Services;
 using SIS.MvcFramework;
@@ -16,9 +16,9 @@ namespace IRunes.App.Controllers
     {
         private readonly IAlbumService albumService;
 
-        public AlbumsController()
+        public AlbumsController(IAlbumService albumService)
         {
-            this.albumService = new AlbumService();
+            this.albumService = albumService;
         }
 
         [Authorize]
@@ -28,6 +28,7 @@ namespace IRunes.App.Controllers
 
             if (allAlbums.Count != 0)
             {
+
                 return this.View(allAlbums.Select(ModelMapper.ProjectTo<AlbumAllViewModel>).ToList());
             }
 
@@ -66,6 +67,8 @@ namespace IRunes.App.Controllers
             Album albumFromDb = this.albumService.GetAlbumById(albumId);
 
             AlbumDetailsViewModel albumViewModel = ModelMapper.ProjectTo<AlbumDetailsViewModel>(albumFromDb);
+            albumViewModel.Name = WebUtility.UrlDecode(albumViewModel.Name);
+            albumViewModel.Cover = WebUtility.UrlDecode(albumViewModel.Cover);
 
             if (albumFromDb == null)
             {

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using IRunes.App.ViewModels;
 using IRunes.Models;
 using IRunes.Models.Models;
@@ -18,10 +19,10 @@ namespace IRunes.App.Controllers
 
         private readonly IAlbumService albumService;
 
-        public TracksController()
+        public TracksController(IAlbumService albumService, ITrackService trackService)
         {
-            this.trackService = new TrackService();
-            this.albumService = new AlbumService();
+            this.trackService = trackService;
+            this.albumService = albumService;
         }
 
         [Authorize]
@@ -71,6 +72,7 @@ namespace IRunes.App.Controllers
 
             TrackDetailsViewModel trackDetailsViewModel = ModelMapper.ProjectTo<TrackDetailsViewModel>(trackFromDb);
             trackDetailsViewModel.AlbumId = albumId;
+            trackDetailsViewModel.Name = WebUtility.UrlDecode(trackDetailsViewModel.Name);
 
             return this.View(trackDetailsViewModel);
         }

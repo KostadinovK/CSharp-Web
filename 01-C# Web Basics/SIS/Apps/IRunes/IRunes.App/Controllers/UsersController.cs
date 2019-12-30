@@ -17,9 +17,9 @@ namespace IRunes.App.Controllers
     {
         private readonly IUserService userService;
 
-        public UsersController()
+        public UsersController(IUserService userService)
         {
-            this.userService = new UserService();
+            this.userService = userService;
         }
 
         [NonAction]
