@@ -1,4 +1,5 @@
-﻿using IRunes.Data;
+﻿using System;
+using IRunes.Data;
 using IRunes.Services;
 using Microsoft.Extensions.Logging;
 using SIS.MvcFramework;
@@ -17,7 +18,7 @@ namespace IRunes.App
             }
         }
 
-        public void ConfigureServices(IServiceProvider serviceProvider)
+        public void ConfigureServices(SIS.MvcFramework.DependencyContainer.IServiceProvider serviceProvider)
         {
             serviceProvider.Add<IAlbumService, AlbumService>();
             serviceProvider.Add<ITrackService, TrackService>();
