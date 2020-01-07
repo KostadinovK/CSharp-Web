@@ -18,6 +18,8 @@ namespace Panda.App
         public void ConfigureServices(IServiceProvider serviceProvider)
         {
             serviceProvider.Add<IUsersService, UsersService>();
+            serviceProvider.Add<IReceiptsService, ReceiptsService>();
+            serviceProvider.Add<IPackageService, PackageService>();
         }
     }
 }

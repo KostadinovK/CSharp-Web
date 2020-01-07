@@ -12,12 +12,12 @@ namespace Panda.Data.Models
         public DateTime IssuedOn { get; set; }
 
         [Required]
-        public string RecipientId { get; set; } = Guid.NewGuid().ToString();
+        public string RecipientId { get; set; }
 
         public User Recipient { get; set; }
 
         [Required]
-        public string PackageId { get; set; } = Guid.NewGuid().ToString();
+        public string PackageId { get; set; }
 
         public Package Package { get; set; }
     }

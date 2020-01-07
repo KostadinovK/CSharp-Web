@@ -21,7 +21,7 @@ namespace Panda.Data.Models
         public DateTime? EstimatedDeliveryDate { get; set; }
 
         [Required]
-        public string RecipientId { get; set; } = Guid.NewGuid().ToString();
+        public string RecipientId { get; set; }
 
         public User Recipient { get; set; }
     }

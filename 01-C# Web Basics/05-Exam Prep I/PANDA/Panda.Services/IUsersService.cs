@@ -10,5 +10,9 @@ namespace Panda.Services
         string CreateUser(string username, string email, string password);
 
         User GetUserOrNull(string username, string password);
+
+        string GetUserId(string username);
+
+        IEnumerable<string> GetUsernames();
     }
 }

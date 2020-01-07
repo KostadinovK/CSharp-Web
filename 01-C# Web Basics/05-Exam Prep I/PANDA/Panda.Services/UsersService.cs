@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -49,6 +50,16 @@ namespace Panda.Services
             var hashPass = HashPassword(password);
 
             return context.Users.SingleOrDefault(u => u.Username == username && u.Password == hashPass);
+        }
+
+        public string GetUserId(string username)
+        {
+            return context.Users.Where(u => u.Username == username).Select(u => u.Id).SingleOrDefault();
+        }
+
+        public IEnumerable<string> GetUsernames()
+        {
+            return context.Users.Select(u => u.Username).ToList();
         }
     }
 }

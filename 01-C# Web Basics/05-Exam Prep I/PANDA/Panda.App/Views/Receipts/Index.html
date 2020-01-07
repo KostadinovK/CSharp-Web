@@ -12,12 +12,15 @@
                 </tr>
             </thead>
             <tbody>
-                <tr class="row">
-                    <th scope="row" class="col-lg-4 d-flex justify-content-center">d</th>
-                    <td class="col-lg-2 d-flex justify-content-center">Fee</td>
-                    <td class="col-lg-3 d-flex justify-content-center">IssuedOn</td>
-                    <td class="col-lg-3 d-flex justify-content-center">Recipient Name</td>
-                </tr>
+                @foreach(var receipt in Model)
+                {
+                    <tr class="row">
+                    <th scope="row" class="col-lg-4 d-flex justify-content-center">@receipt.Id</th>
+                    <td class="col-lg-2 d-flex justify-content-center">@receipt.Fee</td>
+                    <td class="col-lg-3 d-flex justify-content-center">@receipt.IssuedOn</td>
+                    <td class="col-lg-3 d-flex justify-content-center">@receipt.Recipient</td>
+                    </tr>
+                }
             </tbody>
         </table>
     </div>
