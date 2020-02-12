@@ -1,227 +1,151 @@
-﻿using System;
-using System.Collections;
+﻿using SIS.HTTP;
+using SIS.HTTP.Logging;
+using SIS.HTTP.Response;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
-using SIS.HTTP.Enums;
-using SIS.HTTP.Requests;
-using SIS.HTTP.Responses;
-using SIS.MvcFramework.Attributes;
-using SIS.MvcFramework.Attributes.Action;
-using SIS.MvcFramework.Attributes.Security;
-using SIS.MvcFramework.DependencyContainer;
-using SIS.MvcFramework.Logging;
-using SIS.MvcFramework.Result;
-using SIS.MvcFramework.Routing;
-using SIS.MvcFramework.Sessions;
-using IServiceProvider = SIS.MvcFramework.DependencyContainer.IServiceProvider;
+using System.Threading.Tasks;
 
 namespace SIS.MvcFramework
 {
-    using Attributes.Validation;
-    using Validation;
-
     public static class WebHost
     {
-        private static readonly IControllerState controllerState = new ControllerState();
-
-        public static void Start(IMvcApplication application)
+        public static async Task StartAsync(IMvcApplication application)
         {
-            IServerRoutingTable serverRoutingTable = new ServerRoutingTable();
-            IHttpSessionStorage httpSessionStorage = new HttpSessionStorage();
-            IServiceProvider serviceProvider = new ServiceProvider();
-            serviceProvider.Add<ILogger, ConsoleLogger>();
+            IList<Route> routeTable = new List<Route>();
 
-            application.ConfigureServices(serviceProvider);
+            IServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection.Add<ILogger, ConsoleLogger>();
 
-            AutoRegisterRoutes(application, serverRoutingTable, serviceProvider);
-            application.Configure(serverRoutingTable);
-            var server = new Server(8000, serverRoutingTable, httpSessionStorage);
-            server.Run();
+            application.ConfigureServices(serviceCollection);
+            application.Configure(routeTable);
+            AutoRegisterStaticFilesRoutes(routeTable);
+            AutoRegisterActionRoutes(routeTable, application, serviceCollection);
+            
+            var logger = serviceCollection.CreateInstance<ILogger>();
+            logger.Log("Registered routes:");
+            foreach (var route in routeTable)
+            {
+                logger.Log(route.ToString());
+            }
+
+            logger.Log(string.Empty);
+            logger.Log("Requests:");
+            var httpServer = new HttpServer(80, routeTable, logger);
+            await httpServer.StartAsync();
         }
 
-        private static void AutoRegisterRoutes(
-            IMvcApplication application,
-            IServerRoutingTable serverRoutingTable,
-            IServiceProvider serviceProvider)
+        // /{controller}/{action}/
+        private static void AutoRegisterActionRoutes(IList<Route> routeTable, IMvcApplication application, IServiceCollection serviceCollection)
         {
             var controllers = application.GetType().Assembly.GetTypes()
-                .Where(type => type.IsClass && !type.IsAbstract
-                    && typeof(Controller).IsAssignableFrom(type));
-            foreach (var controllerType in controllers)
+                .Where(type => type.IsSubclassOf(typeof(Controller)) && !type.IsAbstract);
+            foreach (var controller in controllers)
             {
-                var actions = controllerType
-                    .GetMethods(BindingFlags.DeclaredOnly
-                    | BindingFlags.Public
-                    | BindingFlags.Instance)
-                    .Where(x => !x.IsSpecialName && x.DeclaringType == controllerType)
-                    .Where(x => x.GetCustomAttributes().All(a => a.GetType() != typeof(NonActionAttribute)));
-
+                var actions = controller.GetMethods()
+                    .Where(x => !x.IsSpecialName
+                    && !x.IsConstructor
+                    && x.IsPublic
+                    && x.DeclaringType == controller);
                 foreach (var action in actions)
                 {
-                    var path = $"/{controllerType.Name.Replace("Controller", string.Empty)}/{action.Name}";
-                    var attribute = action.GetCustomAttributes().Where(
-                        x => x.GetType().IsSubclassOf(typeof(BaseHttpAttribute))).LastOrDefault() as BaseHttpAttribute;
-                    var httpMethod = HttpRequestMethod.Get;
+                    string url = "/" + controller.Name.Replace("Controller", string.Empty) + "/" + action.Name;
+
+                    var attribute = action.GetCustomAttributes()
+                        .FirstOrDefault(x => x.GetType()
+                        .IsSubclassOf(typeof(HttpMethodAttribute)))
+                         as HttpMethodAttribute;
+                    var httpActionType = HttpMethodType.Get;
                     if (attribute != null)
                     {
-                        httpMethod = attribute.Method;
+                        httpActionType = attribute.Type;
+                        if (attribute.Url != null)
+                        {
+                            url = attribute.Url;
+                        }
                     }
 
-                    if (attribute?.Url != null)
-                    {
-                        path = attribute.Url;
-                    }
-
-                    if (attribute?.ActionName != null)
-                    {
-                        path = $"/{controllerType.Name.Replace("Controller", string.Empty)}/{attribute.ActionName}";
-                    }
-
-                    serverRoutingTable.Add(httpMethod, path,
-                        (request) => ProcessRequest(serviceProvider, controllerType, action, request));
-
-                    System.Console.WriteLine(httpMethod + " " + path);
+                    routeTable.Add(new Route(httpActionType, url, (request) => InvokeAction(request, serviceCollection, controller, action)));
                 }
             }
         }
 
-        private static IHttpResponse ProcessRequest(
-            IServiceProvider serviceProvider,
-            System.Type controllerType,
-            MethodInfo action,
-            IHttpRequest request)
+        private static HttpResponse InvokeAction(HttpRequest request, IServiceCollection serviceCollection, Type controllerType, MethodInfo actionMethod)
         {
-            var controllerInstance = serviceProvider.CreateInstance(controllerType) as Controller;
-            controllerState.SetState(controllerInstance);
-            controllerInstance.Request = request;
+            var controller = serviceCollection.CreateInstance(controllerType) as Controller;
+            controller.Request = request;
 
-            // Security Authorization - TODO: Refactor this
-            var controllerPrincipal = controllerInstance.User;
-            var authorizeAttribute = action.GetCustomAttributes()
-                .LastOrDefault(a => a.GetType() == typeof(AuthorizeAttribute)) as AuthorizeAttribute;
-
-            if (authorizeAttribute != null && !authorizeAttribute.IsInAuthority(controllerPrincipal))
+            var actionParameterValues = new List<object>();
+            var actionParameters = actionMethod.GetParameters();
+            foreach (var parameter in actionParameters)
             {
-                // TODO: Redirect to configured URL
-                return new HttpResponse(HttpResponseStatusCode.Forbidden);
-            }
-
-            var parameters = action.GetParameters();
-            var parameterValues = new List<object>();
-
-            foreach (var parameter in parameters)
-            {
-                ISet<string> httpDataValue = TryGetHttpParameter(request, parameter.Name);
-
-                if (parameter.ParameterType.GetInterfaces().Any(
-                    i => i.IsGenericType &&
-                    i.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-                    && parameter.ParameterType != typeof(string))
+                var value = Convert.ChangeType(GetValueFromRequest(request, parameter.Name), parameter.ParameterType);
+                if (value == null && parameter.ParameterType != typeof(string))
                 {
-                    
-                    var collection = httpDataValue.Select(x => System.Convert.ChangeType(x,
-                        parameter.ParameterType.GenericTypeArguments.First()));
-                    parameterValues.Add(collection);
-                    continue;
-                }
-
-                try
-                {
-                    string httpStringValue = httpDataValue.FirstOrDefault();
-                    var parameterValue = System.Convert.ChangeType(httpStringValue, parameter.ParameterType);
-                    parameterValues.Add(parameterValue);
-                }
-                catch
-                {
-                    var paramaterValue = System.Activator.CreateInstance(parameter.ParameterType);
-                    var properties = parameter.ParameterType.GetProperties();
-
-                    foreach (var property in properties)
+                    var parameterValue = Activator.CreateInstance(parameter.ParameterType);
+                    foreach (var property in parameter.ParameterType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
                     {
-                        ISet<string> propertyHttpDataValue = TryGetHttpParameter(request, property.Name);
-
-                        if (property.PropertyType.GetInterfaces().Any(
-                            i => i.IsGenericType &&
-                                 i.GetGenericTypeDefinition() == typeof(IEnumerable<>)) &&
-                            property.PropertyType != typeof(string))
-                        {
-                            var propertyValue = (IList) Activator.CreateInstance(property.PropertyType);
-
-                            foreach (var parameterElement in propertyHttpDataValue)
-                            {
-                                propertyValue.Add(parameterElement);
-                            }
-
-                            property.SetMethod.Invoke(paramaterValue, new object[] { propertyValue });
-                        }
-                        else
-                        {
-                            var firstValue = propertyHttpDataValue.FirstOrDefault();
-                            var propertyValue = System.Convert.ChangeType(firstValue, property.PropertyType);
-                            property.SetMethod.Invoke(paramaterValue, new object[] {propertyValue});
-                        }
+                        var propertyValue = GetValueFromRequest(request, property.Name);
+                        property.SetValue(parameterValue, Convert.ChangeType(propertyValue, property.PropertyType));
                     }
 
-                    if (request.RequestMethod == HttpRequestMethod.Post)
-                    {
-                        controllerState.Reset();
-                        controllerInstance.ModelState = ValidateObject(paramaterValue);
-                        controllerState.Initialize(controllerInstance);
-                    }
-
-                    parameterValues.Add(paramaterValue);
+                    actionParameterValues.Add(parameterValue);
+                }
+                else
+                {
+                    actionParameterValues.Add(value);
                 }
             }
 
-            var response = action.Invoke(controllerInstance, parameterValues.ToArray()) as ActionResult;
+            var response = actionMethod.Invoke(controller, actionParameterValues.ToArray()) as HttpResponse;
             return response;
         }
 
-        private static ModelStateDictionary ValidateObject(object value)
+        private static object GetValueFromRequest(HttpRequest request, string parameterName)
         {
-            var modelState = new ModelStateDictionary();
-
-            var objectProperties = value.GetType().GetProperties();
-
-            foreach (var objectProperty in objectProperties)
-            {
-                var validationAttributes = objectProperty
-                    .GetCustomAttributes()
-                    .Where(type => type is ValidationSisAttribute)
-                    .Cast<ValidationSisAttribute>()
-                    .ToList();
-
-                foreach (var validationAttribute in validationAttributes)
-                {
-                    if (validationAttribute.IsValid(objectProperty.GetValue(value)))
-                    {
-                       continue;
-                    }
-
-                    modelState.Add(objectProperty.Name, validationAttribute.ErrorMessage);
-                }
-            }
-
-            return modelState;
-        }
-
-        private static ISet<string> TryGetHttpParameter(IHttpRequest request, string parameterName)
-        {
+            object value = null;
             parameterName = parameterName.ToLower();
-            ISet<string> httpDataValue = null;
             if (request.QueryData.Any(x => x.Key.ToLower() == parameterName))
             {
-                httpDataValue = request.QueryData.FirstOrDefault(
-                    x => x.Key.ToLower() == parameterName).Value;
+                value = request.QueryData
+                    .FirstOrDefault(x => x.Key.ToLower() == parameterName).Value;
             }
             else if (request.FormData.Any(x => x.Key.ToLower() == parameterName))
             {
-                httpDataValue = request.FormData.FirstOrDefault(
-                    x => x.Key.ToLower() == parameterName).Value;
+                value = request.FormData
+                    .FirstOrDefault(x => x.Key.ToLower() == parameterName).Value;
             }
 
-            return httpDataValue;
+            return value;
+        }
+
+        private static void AutoRegisterStaticFilesRoutes(IList<Route> routeTable)
+        {
+            var staticFiles = Directory.GetFiles("wwwroot", "*", SearchOption.AllDirectories);
+            foreach (var staticFile in staticFiles)
+            {
+                var path = staticFile.Replace("wwwroot", string.Empty).Replace("\\", "/");
+                routeTable.Add(new Route(HttpMethodType.Get, path, (request) =>
+                {
+                    var fileInfo = new FileInfo(staticFile);
+                    var contentType = fileInfo.Extension switch
+                    {
+                        ".css" => "text/css",
+                        ".html" => "text/html",
+                        ".js" => "text/javascript",
+                        ".ico" => "image/x-icon",
+                        ".jpg" => "image/jpeg",
+                        ".jpeg" => "image/jpeg",
+                        ".png" => "image/png",
+                        ".gif" => "image/gif",
+                        _ => "text/plain",
+                    };
+
+                    return new FileResponse(File.ReadAllBytes(staticFile), contentType);
+                }));
+            }
         }
     }
 }

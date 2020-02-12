@@ -1,100 +1,76 @@
-﻿using System.Runtime.CompilerServices;
-using SIS.HTTP.Requests;
-using SIS.MvcFramework.Extensions;
-using SIS.MvcFramework.Identity;
-using SIS.MvcFramework.Result;
-using SIS.MvcFramework.ViewEngine;
+﻿using SIS.HTTP;
+using SIS.HTTP.Response;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace SIS.MvcFramework
 {
-    using Validation;
-
     public abstract class Controller
     {
-        private readonly IViewEngine viewEngine;
+        public HttpRequest Request { get; set; }
 
-        protected Controller()
+        protected HttpResponse View<T>(T viewModel = null, [CallerMemberName]string viewName = null)
+            where T : class
         {
-            this.viewEngine = new SisViewEngine();
-            this.ModelState = new ModelStateDictionary();
+            var typeName = this.GetType().Name/*.Replace("Controller", string.Empty)*/;
+            var controllerName = typeName.Substring(0, typeName.Length - 10);
+            var viewPath = "Views/" + controllerName + "/" + viewName + ".html";
+            return this.ViewByName<T>(viewPath, viewModel);
         }
 
-        // TODO: Refactor this
-        public Principal User => 
-            this.Request.Session.ContainsParameter("principal")
-            ? (Principal) this.Request.Session.GetParameter("principal")
-            : null;
-
-        public IHttpRequest Request { get; set; }
-
-        public ModelStateDictionary ModelState { get; set; }
-
-        protected bool IsLoggedIn()
+        protected HttpResponse View([CallerMemberName]string viewName = null)
         {
-            return this.Request.Session.ContainsParameter("principal");
+            return this.View<object>(null, viewName);
         }
 
-        protected void SignIn(string id, string username, string email)
+        protected HttpResponse Error(string error)
         {
-            this.Request.Session.AddParameter("principal", new Principal
-            {
-                Id = id,
-                Username = username,
-                Email = email
-            });
+            return this.ViewByName<ErrorViewModel>("Views/Shared/Error.html", new ErrorViewModel { Error = error });
+        }
+
+        protected HttpResponse Redirect(string url)
+        {
+            return new RedirectResponse(url);
+        }
+
+        protected HttpResponse NotFound()
+        {
+            return new StatusCodeResponse(HttpResponseCode.NotFound);
+        }
+
+        private HttpResponse ViewByName<T>(string viewPath, object viewModel)
+        {
+            IViewEngine viewEngine = new ViewEngine();
+            var html = File.ReadAllText(viewPath);
+            html = viewEngine.GetHtml(html, viewModel, this.User);
+
+            var layout = File.ReadAllText("Views/Shared/_Layout.html");
+            var bodyWithLayout = layout.Replace("@RenderBody()", html);
+            bodyWithLayout = viewEngine.GetHtml(bodyWithLayout, viewModel, this.User);
+            return new HtmlResponse(bodyWithLayout);
+        }
+
+        protected bool IsUserLoggedIn()
+        {
+            return this.User != null;
+        }
+
+        protected void SignIn(string userId)
+        {
+            this.Request.SessionData["UserId"] = userId;
         }
 
         protected void SignOut()
         {
-            this.Request.Session.ClearParameters();
+            this.Request.SessionData["UserId"] = null;
         }
 
-        protected ActionResult View([CallerMemberName] string view = null)
-        {
-            return this.View<object>(null, view);
-        }
-
-        protected ActionResult View<T>(T model = null, [CallerMemberName] string view = null)
-            where T : class
-        {
-            // TODO: Support for layout
-            string controllerName = this.GetType().Name.Replace("Controller", string.Empty);
-            string viewName = view;
-
-            string viewContent = System.IO.File.ReadAllText("Views/" + controllerName + "/" + viewName + ".html");
-            viewContent = this.viewEngine.GetHtml(viewContent, model,this.ModelState, this.User);
-
-            string layoutContent = System.IO.File.ReadAllText("Views/_Layout.html");
-            layoutContent = this.viewEngine.GetHtml(layoutContent, model,this.ModelState, this.User);
-            layoutContent = layoutContent.Replace("@RenderBody()", viewContent);
-
-            var htmlResult = new HtmlResult(layoutContent);
-            return htmlResult;
-        }
-
-        protected ActionResult Redirect(string url)
-        {
-            return new RedirectResult(url);
-        }
-
-        protected ActionResult Xml(object obj)
-        {
-            return new XmlResult(obj.ToXml());
-        }
-
-        protected ActionResult Json(object obj)
-        {
-            return new JsonResult(obj.ToJson());
-        }
-
-        protected ActionResult File(byte[] fileContent)
-        {
-            return new FileResult(fileContent);
-        }
-
-        protected ActionResult NotFound(string message = "")
-        {
-            return new NotFoundResult(message);
-        }
+        public string User =>
+            this.Request.SessionData.ContainsKey("UserId") ?
+                this.Request.SessionData["UserId"] : null;
     }
 }

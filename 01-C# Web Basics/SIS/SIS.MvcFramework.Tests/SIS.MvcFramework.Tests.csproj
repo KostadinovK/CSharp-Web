@@ -1,16 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
+    <PackageReference Include="xunit" Version="2.4.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
+    <PackageReference Include="coverlet.collector" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,22 +18,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="ViewTests\TestWithoutCSharpCode.html">
+    <None Update="ViewTests\ForForeachIfView.Expected.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="ViewTests\TestWithoutCSharpCode.Result.html">
+    <None Update="ViewTests\ForForeachIfView.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="ViewTests\UseForForeachAndIf.html">
+    <None Update="ViewTests\OnlyHtmlView.Expected.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="ViewTests\UseForForeachAndIf.Result.html">
+    <None Update="ViewTests\OnlyHtmlView.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="ViewTests\UseModelData.html">
+    <None Update="ViewTests\ViewModelView.Expected.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="ViewTests\UseModelData.Result.html">
+    <None Update="ViewTests\ViewModelView.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
